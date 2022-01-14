@@ -1,0 +1,228 @@
+/* colorscheme: 
+    dark blue: #566FA3,
+    red: #F08C78,
+    blue: #97B3F0,
+    light green: #C7F07D,
+    green: #AABF82 */
+
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Righteous&family=Roboto+Condensed:wght@300&display=swap');
+
+body {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    height: 100vh;
+    max-height: 100vh;
+    margin: 0;
+}
+
+h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 3rem;
+    line-height: 3rem;
+    padding-top: 10px;
+    margin-top: 0;
+}
+
+#wordle {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    max-width: 860px;
+    text-align: center;
+    height: 100%;
+    min-height: 0;
+}
+
+#guesses {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    height: auto;
+    min-height: 0;
+}
+
+.guess {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+}
+
+div.letter {
+    border: 1px solid black;
+    max-width: 5rem;
+    max-height: 5rem;
+    width: 8.3vh;
+    height: 8.3vh;
+    margin: 0.25rem;
+    text-align: center;
+    font-size: 3rem;
+    font-family: sans-serif;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    perspective: 1000px;
+    transition: transform 0.8s;
+    transform-style: preserve-3d;
+    user-select: none;
+}
+
+#keyboard {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    user-select: none;
+    height: max-content;
+}
+
+#keyboard > div {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.keyboard-key {
+    padding: 1rem;
+    margin: 0.5rem;
+    border: 1px solid black;
+    line-height: 1rem;
+    min-width: 0.75rem;
+    text-align: center;
+    font-family: sans-serif;
+    border-radius: 5px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+@media (max-width: 900px) {
+    .keyboard-key {
+        font-size: 10pt;
+        min-width: 4vw;
+        padding: 2vw;
+        margin: 0.5vw;
+    }
+}
+
+#keyboard .wrong {
+    background-color: #DDDDDD;
+    color: #888888;
+}
+
+#guesses {
+    font-weight: bold;
+}
+
+#guesses .wrong {
+    background-color: #F08C78;
+    color: white;
+    transform: rotateY(180deg) scaleX(-1);
+}
+
+.position {
+    background-color: #97B3F0;
+    color: white;
+    transform: rotateY(180deg) scaleX(-1);
+}
+
+.correct {
+    background-color: #AABF82;
+    color: white;
+    transform: rotateY(180deg) scaleX(-1);
+}
+
+@keyframes shake {
+    0% { transform: translate(1px, 1px) rotate(0deg); }
+    10% { transform: translate(-1px, -2px) rotate(-1deg); }
+    20% { transform: translate(-3px, 0px) rotate(1deg); }
+    30% { transform: translate(3px, 2px) rotate(0deg); }
+    40% { transform: translate(1px, -1px) rotate(1deg); }
+    50% { transform: translate(-1px, 2px) rotate(-1deg); }
+    60% { transform: translate(-3px, 1px) rotate(0deg); }
+    70% { transform: translate(3px, 1px) rotate(-1deg); }
+    80% { transform: translate(-1px, -1px) rotate(1deg); }
+    90% { transform: translate(1px, 2px) rotate(0deg); }
+    100% { transform: translate(1px, -2px) rotate(-1deg); }
+}
+
+div.not-a-word {
+    animation: shake 0.5s;
+}
+
+#end-modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background-color: rgba(0,0,0,0.4);
+}
+
+#modal-content {
+    background-color: #fefefe;
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid black;
+    border-radius: 5px;
+    width: 80%;
+    font-family: sans-serif;
+    font-size: 20pt;
+}
+
+#modal-content p {
+    text-align: center;
+}
+
+#close-modal {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+#close-modal:hover,
+#close-modal:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+#emoji-grid {
+    background-color: white;
+    border: 1px solid black;
+    padding: 5px;
+    font-size: 14pt;
+}
+
+#emoji-grid:hover {
+    cursor: pointer;
+    background-color: #ddd;
+    font-family: sans-serif;
+}
+
+#modal-holder {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+#grid-holder {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+
+#grid-actual {
+    display: none;
+    white-space: pre-line;
+    background-color: #EEE;
+    margin: 10px;
+    padding: 10px;
+    border: 1px solid black;
+    width: max-content;
+}
