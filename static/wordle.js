@@ -139,7 +139,7 @@ async function make_guess(guess = '') {
                 let keyboardKey = document.getElementById('key-' + guess.charAt(i).toUpperCase());
                 if (value.answers[i] === 'correct' || keyboardKey.className === 'keyboard-key correct') {
                     keyboardKey.className = 'keyboard-key correct';
-                } else if (value.answers[i] === 'position' || keyboardKey.classname === 'keyboard-key position') {
+                } else if (value.answers[i] === 'position' || keyboardKey.className === 'keyboard-key position') {
                     keyboardKey.className = 'keyboard-key position';
                 } else if (value.answers[i] === 'wrong') {
                     keyboardKey.className = 'keyboard-key wrong';
