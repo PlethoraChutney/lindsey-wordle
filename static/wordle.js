@@ -204,6 +204,8 @@ $(document).keydown(function(e) {
         read_key('enter');
     } else if (working_guess.length < 5 && e.keyCode >= 65 && e.keyCode <= 90) {
         read_key(String.fromCharCode(e.which));
+    } else if (e.keyCode === 27) {
+        $('#end-modal').addClass('hidden');
     }
 });
 
