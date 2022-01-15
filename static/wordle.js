@@ -232,7 +232,7 @@ function fallbackClipboard(text) {
   
     document.body.removeChild(textArea);
   }
-  function copyTextToClipboard(text) {
+function copyTextToClipboard(text) {
     if (!navigator.clipboard) {
       fallbackCopyTextToClipboard(text);
       return;
@@ -242,8 +242,9 @@ function fallbackClipboard(text) {
     }, function(err) {
       console.error('Async: Could not copy text: ', err);
     });
-  }
+}
 
+// make emoji grid
 async function getEmojiGrid() {
     const response = await fetch(wordle_url, {
         method: 'POST',
@@ -259,10 +260,10 @@ async function getEmojiGrid() {
     })
 
     response.json().then((value) => {
-        $('#grid-actual')
-            .text(value);
+        document.getElementById('grid-actual')
+            .innerHTML = value.replace('\n', '<br/>');
         $('#grid-holder').removeClass('hidden');
-        fallbackClipboard(value);
+        copyTextToClipboard(value);
     })
     
 };
