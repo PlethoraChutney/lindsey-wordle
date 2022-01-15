@@ -149,8 +149,19 @@ div.letter {
     100% { transform: translate(1px, -2px) rotate(-1deg); }
 }
 
+@keyframes winner {
+    00% {transform: translate(0px, 0px);}
+    25% {transform: translate(0px, 7px);}
+    75% {transform: translate(0px, -7px);}
+    100% {transform: translate(0px, 0px);}
+}
+
 div.not-a-word {
     animation: shake 0.5s;
+}
+
+div.winner-word {
+    animation: winner 0.5s;
 }
 
 #end-modal {
@@ -218,7 +229,7 @@ div.not-a-word {
 }
 
 #grid-actual {
-    white-space: pre-line;
+    white-space: pre;
     background-color: #EEE;
     margin: 10px;
     padding: 10px;

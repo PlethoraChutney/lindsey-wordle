@@ -146,12 +146,22 @@ async function make_guess(guess = '') {
                 }
             }
             working_guess = [];
-            if (correct_word(value.answers)) {
-                end_modal('You did it! Nice work!');
-                word_guessed = true;
-            } else if (value.word && thisGuess == 5) {
-                end_modal('Sorry, better luck next time!\nYour word was ' + value.word + '.');
-            }
+
+            window.setTimeout(() => {
+                if (correct_word(value.answers)) {
+                    word_guessed = true;
+                    for (let i = 0; i < value.answers.length; i++) {
+                        window.setTimeout(() => {
+                            row.children[i].classList.add('winner-word');
+                        }, 75 * i)
+                    }
+                    window.setTimeout(() => {
+                        end_modal('You did it! Nice work!');
+                    }, 1250);
+                } else if (value.word && thisGuess == 5) {
+                    end_modal('Sorry, better luck next time!\nYour word was ' + value.word + '.');
+                }
+            }, 1250);
 
         } else {
             row.classList.add('not-a-word');
