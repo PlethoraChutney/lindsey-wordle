@@ -157,7 +157,7 @@ async function make_guess(guess = '') {
                     }
                     window.setTimeout(() => {
                         end_modal('You did it! Nice work!');
-                    }, 1250);
+                    }, 1750);
                 } else if (value.word && thisGuess == 5) {
                     end_modal('Sorry, better luck next time!\nYour word was ' + value.word + '.');
                 }
