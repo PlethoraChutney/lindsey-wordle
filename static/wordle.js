@@ -261,7 +261,7 @@ async function getEmojiGrid() {
 
     response.json().then((value) => {
         document.getElementById('grid-actual')
-            .innerHTML = value.replace('\n', '<br/>');
+            .innerHTML = value.replace(/\n/gi, '<br/>');
         $('#grid-holder').removeClass('hidden');
         copyTextToClipboard(value);
     })
