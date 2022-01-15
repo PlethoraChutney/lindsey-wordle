@@ -161,7 +161,7 @@ async function make_guess(guess = '') {
                 } else if (value.word && thisGuess == 5) {
                     end_modal('Sorry, better luck next time!\nYour word was ' + value.word + '.');
                 }
-            }, 1250);
+            }, 1750);
 
         } else {
             row.classList.add('not-a-word');
