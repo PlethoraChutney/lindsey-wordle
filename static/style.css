@@ -154,7 +154,6 @@ div.not-a-word {
 }
 
 #end-modal {
-    display: none;
     position: fixed;
     z-index: 1;
     width: 100%;
@@ -172,6 +171,7 @@ div.not-a-word {
     width: 80%;
     font-family: sans-serif;
     font-size: 20pt;
+    max-width: 800px;
 }
 
 #modal-content p {
@@ -218,11 +218,15 @@ div.not-a-word {
 }
 
 #grid-actual {
-    display: none;
     white-space: pre-line;
     background-color: #EEE;
     margin: 10px;
     padding: 10px;
     border: 1px solid black;
     width: max-content;
+}
+
+.hidden {
+    display: none;
+    visibility: hidden;
 }

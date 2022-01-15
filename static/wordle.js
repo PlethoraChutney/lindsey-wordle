@@ -92,15 +92,15 @@ function correct_word(answer_array) {
 function end_modal(message) {
     $('#modal-content p')
         .text(message);
-    $('#end-modal').css('display', 'block');
+    $('#end-modal').toggleClass('hidden');
 };
 
 $('#close-modal').click(() => {
-    $('#end-modal').css('display', 'none');
+    $('#end-modal').toggleClass('hidden');
 });
 
 $('#end-modal').click(function() {
-    $('#end-modal').css('display', 'none');
+    $('#end-modal').toggleClass('hidden');
 });
 
 $('#modal-content').click(function(e) {
@@ -250,8 +250,8 @@ async function getEmojiGrid() {
 
     response.json().then((value) => {
         $('#grid-actual')
-            .text(value)
-            .css('display', 'block');
+            .text(value);
+        $('#grid-holder').removeClass('hidden');
         fallbackClipboard(value);
     })
     
