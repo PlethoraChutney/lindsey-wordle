@@ -29,8 +29,8 @@ def make_emoji_grid(session):
     emoji_lists = [x.replace('wrong', '🟥').replace('position', '🟦').replace('correct', '🟩') for x in emoji_lists]
     emoji_grid = '\n'.join(emoji_lists)
     formatted_date = datetime.datetime.strftime(
-        word_and_time[1],
-        '%a, %b %d, %I:%M'
+        session['word_generation_time'],
+        '%a, %b %d, %H:%M'
     )
     emoji_grid = f'L-Wordle\n{formatted_date}\n{emoji_grid}'
 
@@ -66,9 +66,11 @@ def result():
             if session['word'] != word_and_time[0]:
                 session['word'] = word_and_time[0]
                 session['prior_guesses'] = []
+                session['word_generation_time'] = word_and_time[1]
         except KeyError:
             session['word'] = word_and_time[0]
             session['prior_guesses'] = []
+            session['word_generation_time'] = word_and_time[1]
             
         use_dark_theme = request.args.get('theme') == 'dark'
         return render_template('wordle.html', night_theme = use_dark_theme)
