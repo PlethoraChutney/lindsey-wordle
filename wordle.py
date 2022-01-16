@@ -10,6 +10,10 @@ app.secret_key = 'BAD_SECRET_KEY_FOR_LINDSEYS_WORDLE'
 with open('words.json', 'r') as f:
     word_list = json.load(f)
 
+# maintain a not-word list to reduce API usage
+with open('not-words.json', 'r') as f:
+    not_words = json.load(f)
+
 # have to use a list so that it is globally modifiable
 word_and_time = [
     random.choice(word_list),
@@ -23,7 +27,16 @@ def check_real_word(word, word_list):
 
     if word in word_list:
         return True
-    return type(requests.get(mw_url_and_key, timeout = 400).json()[0]) == dict
+    elif word in not_words:
+        return False
+
+    is_a_word = type(requests.get(mw_url_and_key, timeout = 400).json()[0]) == dict
+    if is_a_word:
+        word_list.append(word)
+        return True
+    else:
+        not_words.append(word)
+        return False
 
 def make_emoji_grid(session):
     emoji_lists = [check_letter(guess, session['word']) for guess in session['prior_guesses']]
@@ -81,8 +94,12 @@ def result():
             word_and_time[0] = random.choice(word_list)
             session['prior_guesses'] = []
             word_and_time[1] = datetime.datetime.now()
+
+            # update our word "databases"
             with open('words.json', 'w') as f:
                 json.dump(word_list, f)
+            with open('not-words.json', 'w') as f:
+                json.dump(not_words, f)
             
 
         try:
