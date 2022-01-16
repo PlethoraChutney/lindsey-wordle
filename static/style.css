@@ -265,7 +265,7 @@ div.winner-word {
     
     #guesses .wrong {
         background-color: #663F37;
-        color: #666;
+        color: #AAA;
     }
     
     .correct {
