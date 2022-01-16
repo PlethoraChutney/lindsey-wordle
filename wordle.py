@@ -5,18 +5,6 @@ import requests
 import datetime
 import spellchecker
 
-app = Flask(__name__)
-app.secret_key = 'BAD_SECRET_KEY_FOR_LINDSEYS_WORDLE'
-
-with open('words.json', 'r') as f:
-    word_list = json.load(f)
-
-# have to use a list so that it is globally modifiable
-word_and_time = [
-    random.choice(word_list),
-    datetime.datetime.now()
-]
-
 
 def check_real_word(word):
     checker = spellchecker.SpellChecker()
@@ -112,3 +100,17 @@ def result():
         # get emoji grid for sharing
         elif req_json['action'] == 'get_emoji_grid':
             return json.dumps(make_emoji_grid(session)), 200, {'ContentType': 'application/json'}
+
+
+if __name__ == '__main__':
+    app = Flask(__name__)
+    app.secret_key = 'BAD_SECRET_KEY_FOR_LINDSEYS_WORDLE'
+
+    with open('words.json', 'r') as f:
+        word_list = json.load(f)
+
+    # have to use a list so that it is globally modifiable
+    word_and_time = [
+        random.choice(word_list),
+        datetime.datetime.now()
+    ]
