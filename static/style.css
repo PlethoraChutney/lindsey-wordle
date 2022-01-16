@@ -241,3 +241,63 @@ div.winner-word {
     display: none;
     visibility: hidden;
 }
+
+@media screen and (prefers-color-scheme: dark){
+    body {
+        background-color: #263047;
+        color: #999;
+    }
+    
+    div.letter, .keyboard-key {
+        border: 1px solid #999;
+    }
+    
+    .position {
+        background-color: #415685;
+        color: #AAA;
+    }
+    
+    #keyboard .wrong {
+        background-color: #32353D;
+        color: #666;
+        border: 1px solid #666;
+    }
+    
+    #guesses .wrong {
+        background-color: #663F37;
+        color: #666;
+    }
+    
+    .correct {
+        background-color: #3C4728;
+        color: #AAA;
+    }
+
+    #modal-content {
+        background-color: #32353D;
+        border: 1px solid #999;
+    }
+    
+    #close-modal {
+        color: #999
+    }
+    
+    #close-modal:hover,
+    #close-modal:focus {
+        color: #666;
+    }
+    
+    #emoji-grid {
+        background-color: #32353D;
+        border: 1px solid #999;
+    }
+    
+    #emoji-grid:hover {
+        background-color: #666;
+    }
+    
+    #grid-actual {
+        background-color: #23262B;
+        border: 1px solid #999
+    }
+}

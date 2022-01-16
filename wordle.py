@@ -70,8 +70,8 @@ def result():
             session['word'] = word_and_time[0]
             session['prior_guesses'] = []
             
-
-        return render_template('wordle.html')
+        use_dark_theme = request.args.get('theme') == 'dark'
+        return render_template('wordle.html', night_theme = use_dark_theme)
 
     elif request.method == 'POST':
         req_json = request.get_json()
