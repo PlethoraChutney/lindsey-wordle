@@ -16,12 +16,14 @@ word_and_time = [
     datetime.datetime.now()
 ]
 
-def check_real_word(word):
+
+def check_real_word(word, word_list):
+    # don't steal my Merriam Webster key
+    mw_url_and_key = f'https://dictionaryapi.com/api/v3/references/collegiate/json/{word}?key=d8013059-c968-47c9-b30c-0f3de19e7523'
+
     if word in word_list:
         return True
-    elif requests.get(f'https://api.dictionaryapi.dev/api/v2/entries/en/{word}').status_code != 404:
-        word_list.append(word)
-        return True
+    return type(requests.get(mw_url_and_key, timeout = 400).json()[0]) == dict
 
 def make_emoji_grid(session):
     emoji_lists = [check_letter(guess, session['word']) for guess in session['prior_guesses']]
@@ -48,6 +50,27 @@ def check_letter(guess, word):
             letters[i] = 'position'
             word.remove(letter)
     return letters
+
+def make_guess(guess, session):
+    if not check_real_word(guess, word_list):
+        return {'real_word': False}
+
+    result = check_letter(guess, session['word'])
+    if guess not in session['prior_guesses'] and len(session['prior_guesses']) < 6:
+        temp = session['prior_guesses']
+        temp.append(guess)
+        session['prior_guesses'] = temp
+
+    answer_returns = {
+        'real_word': True,
+        'answers': result
+    }
+    if len(session['prior_guesses']) == 6:
+        answer_returns['word'] = session['word']
+    else:
+        answer_returns['word'] = False
+
+    return answer_returns
 
 @app.route('/', methods=['GET', 'POST'])
 def result():
@@ -80,24 +103,7 @@ def result():
 
         # make a guess
         if req_json['action'] == 'make_guess':
-            guess = req_json['guess'].lower()
-            if not check_real_word(guess):
-                return json.dumps({'real_word': False}), 200, {'ContentType': 'application/json'}
-            result = check_letter(guess, session['word'])
-            if guess not in session['prior_guesses'] and len(session['prior_guesses']) < 6:
-                temp = session['prior_guesses']
-                temp.append(guess)
-                session['prior_guesses'] = temp
-
-            answer_returns = {
-                'real_word': True,
-                'answers': result
-            }
-            if len(session['prior_guesses']) == 6:
-                answer_returns['word'] = session['word']
-            else:
-                answer_returns['word'] = False
-            return json.dumps(answer_returns), 200, {'ContentType': 'application/json'}
+            return json.dumps(make_guess(req_json['guess'].lower(), session)), 200, {'ContentType': 'application/json'}
 
         # get prior guesses
         elif req_json['action'] == 'setup':
