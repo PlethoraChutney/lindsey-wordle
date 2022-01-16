@@ -1,12 +1,12 @@
 from flask import Flask, render_template, request, session
 import json
 import random
-import requests
+import os
 import datetime
 import spellchecker
 
 app = Flask(__name__)
-app.secret_key = 'BAD_SECRET_KEY_FOR_LINDSEYS_WORDLE'
+app.secret_key = os.environ['SESSION_KEY']
 
 with open('words.json', 'r') as f:
     word_list = json.load(f)
