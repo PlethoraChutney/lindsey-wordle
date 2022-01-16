@@ -19,8 +19,9 @@ word_and_time = [
 def check_real_word(word):
     if word in word_list:
         return True
-    else:
-        return requests.get(f'https://api.dictionaryapi.dev/api/v2/entries/en/{word}').status_code != 404
+    elif requests.get(f'https://api.dictionaryapi.dev/api/v2/entries/en/{word}').status_code != 404:
+        word_list.append(word)
+        return True
 
 def make_emoji_grid(session):
     emoji_lists = [check_letter(guess, session['word']) for guess in session['prior_guesses']]
@@ -57,6 +58,8 @@ def result():
             word_and_time[0] = random.choice(word_list)
             session['prior_guesses'] = []
             word_and_time[1] = datetime.datetime.now()
+            with open('words.json', 'w') as f:
+                json.dump(word_list, f)
             
 
         try:
