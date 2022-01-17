@@ -1,6 +1,10 @@
 body {
-    background-color: #263047;
+    background-color: #151821;
     color: #999;
+}
+
+#guesses {
+    color: #666;
 }
 
 div.letter, .keyboard-key {
@@ -8,33 +12,28 @@ div.letter, .keyboard-key {
 }
 
 .position {
-    background-color: #415685;
-    color: #AAA;
+    background-color: #2F3340;
+    color: #888;
 }
 
 #keyboard .wrong {
-    background-color: #32353D;
+    background-color: #422E29;
     color: #666;
     border: 1px solid #666;
 }
 
 #guesses .wrong {
-    background-color: #663F37;
-    color: #AAA;
+    background-color: #422E29;
 }
 
 .correct {
-    background-color: #39471E;
-    color: #AAA;
+    background-color: #3A452B;
+    color: #aaa;
 }
 
 #modal-content {
     background-color: #32353D;
     border: 1px solid #999;
-}
-
-#close-modal {
-    color: #999
 }
 
 #close-modal:hover,
