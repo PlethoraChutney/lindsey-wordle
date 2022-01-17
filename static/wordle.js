@@ -109,7 +109,7 @@ $('#modal-content').click(function(e) {
 
 $('#emoji-grid').click(getEmojiGrid);
 
-async function make_guess(guess = '') {
+async function make_guess(guess = '', setup_guess = false) {
     // Keep track of which guess this request corresponds to (for async)
     const thisGuess = current_guess;
     const row = document.getElementById('guess-' + thisGuess);
@@ -125,7 +125,10 @@ async function make_guess(guess = '') {
         },
         redirect: 'follow',
         referrerPolicy: 'no-referrer',
-        body: JSON.stringify({"action": "make_guess", "guess": guess})
+        body: JSON.stringify({
+            "action": "make_guess",
+            "is_setup": setup_guess,
+            "guess": guess})
     })
     
     response.json().then((value) => {
@@ -159,7 +162,7 @@ async function make_guess(guess = '') {
                         end_modal('You did it! Nice work!');
                     }, 1750);
                 } else if (value.word && thisGuess == 5) {
-                    end_modal('Sorry, better luck next time!\nYour word was ' + value.word + '.');
+                    end_modal('Sorry, better luck next time!\nThe word was ' + value.word + '.');
                 }
             }, 1750);
 

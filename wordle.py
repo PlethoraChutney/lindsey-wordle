@@ -26,7 +26,13 @@ def check_real_word(word):
 def make_emoji_grid(session):
     emoji_lists = [check_letter(guess, session['word']) for guess in session['prior_guesses']]
     emoji_lists = [' '.join(x) for x in emoji_lists]
-    emoji_lists = [x.replace('wrong', '🟥').replace('position', '🟦').replace('correct', '🟩') for x in emoji_lists]
+    emoji_lists = [x.replace(
+        'wrong', '🟥'
+        ).replace(
+            'position', '🟦'
+            ).replace(
+                'correct', '🟩'
+                ) for x in emoji_lists]
     emoji_grid = '\n'.join(emoji_lists)
     formatted_date = datetime.datetime.strftime(
         session['word_generation_time'],
@@ -74,17 +80,14 @@ def make_guess(guess, session):
 def result():
     # build the page
     if request.method == 'GET':
+        # detect if new word needed
         time_since_word = datetime.datetime.now() - word_and_time[1]
         if time_since_word.total_seconds() > 30 * 60:
             word_and_time[0] = random.choice(word_list)
             session['prior_guesses'] = []
             word_and_time[1] = datetime.datetime.now()
 
-            # update our word "databases"
-            with open('words.json', 'w') as f:
-                json.dump(word_list, f)
-            
-
+        # Update session, if necessary
         try:
             if session['word'] != word_and_time[0]:
                 session['word'] = word_and_time[0]
@@ -103,12 +106,18 @@ def result():
 
         # make a guess
         if req_json['action'] == 'make_guess':
-            return json.dumps(make_guess(req_json['guess'].lower(), session)), 200, {'ContentType': 'application/json'}
+            return json.dumps(
+                make_guess(req_json['guess'].lower(), session)
+                ), 200, {'ContentType': 'application/json'}
 
         # get prior guesses
         elif req_json['action'] == 'setup':
-            return json.dumps(session['prior_guesses']), 200, {'ContentType': 'application/json'}
+            return json.dumps(
+                session['prior_guesses']
+                ), 200, {'ContentType': 'application/json'}
 
         # get emoji grid for sharing
         elif req_json['action'] == 'get_emoji_grid':
-            return json.dumps(make_emoji_grid(session)), 200, {'ContentType': 'application/json'}
+            return json.dumps(
+                make_emoji_grid(session)
+                ), 200, {'ContentType': 'application/json'}
