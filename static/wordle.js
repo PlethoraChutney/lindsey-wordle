@@ -73,31 +73,31 @@ async function getSetup(url = url) {
     return response.json();
 };
 
-function setup_word(word, answers) {
+function setup_word(word, guesses, answer) {
     const thisGuess = current_guess;
     const row = document.getElementById('guess-' + thisGuess);
     current_guess++;
 
-    for (let i = 0; i < answers.length; i++) {
+    for (let i = 0; i < guesses.length; i++) {
         window.setTimeout(() => {
-            row.children[i].classList.add(answers[i]);
+            row.children[i].classList.add(guesses[i]);
             row.children[i].innerHTML = word.charAt(i).toUpperCase();
 
             let keyboardKey = document.getElementById('key-' + word.charAt(i).toUpperCase());
-            if (answers[i] === 'correct' || keyboardKey.className === 'keyboard-key correct') {
+            if (guesses[i] === 'correct' || keyboardKey.className === 'keyboard-key correct') {
                 keyboardKey.className = 'keyboard-key correct';
-            } else if (answers[i] === 'position' || keyboardKey.className === 'keyboard-key position') {
+            } else if (guesses[i] === 'position' || keyboardKey.className === 'keyboard-key position') {
                 keyboardKey.className = 'keyboard-key position';
-            } else if (answers[i] === 'wrong') {
+            } else if (guesses[i] === 'wrong') {
                 keyboardKey.className = 'keyboard-key wrong';
             }
         }, 250 * i);
     }
 
     window.setTimeout(() => {
-        if (correct_word(answers)) {
+        if (correct_word(guesses)) {
             word_guessed = true;
-            for (let i = 0; i < answers.length; i++) {
+            for (let i = 0; i < guesses.length; i++) {
                 window.setTimeout(() => {
                     row.children[i].classList.add('winner-word');
                 }, 75 * i)
@@ -106,21 +106,27 @@ function setup_word(word, answers) {
                 end_modal('You did it! Nice work!');
             }, 1750);
         } else if (thisGuess == 5) {
-            end_modal('Sorry, better luck next time!');
+            end_modal(`Sorry, better luck next time!\nThe word was ${answer}`);
         }
     }, 1750);
 
 }
 
 let current_guess = 0;
+let previous_guesses = [];
 
 getSetup(wordle_url).then((response) => {
     words = response[0];
-    answers = response[1];
+    guesses = response[1];
+    answer = response[2];
 
-    for (let i = 0; i < answers.length; i++) {
-        setup_word(words[i], answers[i]);
+
+    for (let i = 0; i < guesses.length; i++) {
+        setup_word(words[i], guesses[i], answer);
+        previous_guesses.push(words[i]);
     }
+
+    return words;
 });
 
 function correct_word(answer_array) {
@@ -154,6 +160,14 @@ async function make_guess(guess = '') {
     const thisGuess = current_guess;
     const row = document.getElementById('guess-' + thisGuess);
     current_guess++;
+    console.log(previous_guesses);
+
+    if (previous_guesses.includes(guess.toLocaleLowerCase())) {
+        row.classList.add('not-a-word');
+        current_guess--;
+        setTimeout(() => {row.classList.remove('not-a-word')}, 500);
+        return false;
+    }
 
     const response = await fetch(wordle_url, {
         method: 'POST',
@@ -172,6 +186,7 @@ async function make_guess(guess = '') {
     
     response.json().then((value) => {
         if (value.real_word) {
+            previous_guesses.push(guess.toLocaleLowerCase());
             for (let i = 0; i < value.answers.length; i++) {
                 window.setTimeout(() => {
                     row.children[i].classList.add(value.answers[i]);

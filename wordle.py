@@ -118,10 +118,12 @@ def result():
 
         # get prior guesses
         elif req_json['action'] == 'setup':
-            return json.dumps([
-                session['prior_guesses'],
-                session['prior_answers']
-            ]), 200, {'ContentType': 'application/json'}
+            setup_lists = [session['prior_guesses'], session['prior_answers']]
+            if len(session['prior_guesses']) == 6:
+                setup_lists.append(session['word'])
+            return json.dumps(
+                setup_lists
+            ), 200, {'ContentType': 'application/json'}
 
         # get emoji grid for sharing
         elif req_json['action'] == 'get_emoji_grid':
