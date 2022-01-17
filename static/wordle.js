@@ -73,15 +73,55 @@ async function getSetup(url = url) {
     return response.json();
 };
 
+function setup_word(word, answers) {
+    const thisGuess = current_guess;
+    const row = document.getElementById('guess-' + thisGuess);
+    current_guess++;
+
+    for (let i = 0; i < answers.length; i++) {
+        window.setTimeout(() => {
+            row.children[i].classList.add(answers[i]);
+            row.children[i].innerHTML = word.charAt(i).toUpperCase();
+
+            let keyboardKey = document.getElementById('key-' + word.charAt(i).toUpperCase());
+            if (answers[i] === 'correct' || keyboardKey.className === 'keyboard-key correct') {
+                keyboardKey.className = 'keyboard-key correct';
+            } else if (answers[i] === 'position' || keyboardKey.className === 'keyboard-key position') {
+                keyboardKey.className = 'keyboard-key position';
+            } else if (answers[i] === 'wrong') {
+                keyboardKey.className = 'keyboard-key wrong';
+            }
+        }, 250 * i);
+    }
+
+    window.setTimeout(() => {
+        if (correct_word(answers)) {
+            word_guessed = true;
+            for (let i = 0; i < answers.length; i++) {
+                window.setTimeout(() => {
+                    row.children[i].classList.add('winner-word');
+                }, 75 * i)
+            }
+            window.setTimeout(() => {
+                end_modal('You did it! Nice work!');
+            }, 1750);
+        } else if (thisGuess == 5) {
+            end_modal('Sorry, better luck next time!');
+        }
+    }, 1750);
+
+}
+
 let current_guess = 0;
 
-getSetup(wordle_url).then(
-    (value) => {
-        for (guess of value) {
-            make_guess(guess);
-        };
+getSetup(wordle_url).then((response) => {
+    words = response[0];
+    answers = response[1];
+
+    for (let i = 0; i < answers.length; i++) {
+        setup_word(words[i], answers[i]);
     }
-);
+});
 
 function correct_word(answer_array) {
     return answer_array.every((v) => v === 'correct');
@@ -109,7 +149,7 @@ $('#modal-content').click(function(e) {
 
 $('#emoji-grid').click(getEmojiGrid);
 
-async function make_guess(guess = '', setup_guess = false) {
+async function make_guess(guess = '') {
     // Keep track of which guess this request corresponds to (for async)
     const thisGuess = current_guess;
     const row = document.getElementById('guess-' + thisGuess);
@@ -127,7 +167,6 @@ async function make_guess(guess = '', setup_guess = false) {
         referrerPolicy: 'no-referrer',
         body: JSON.stringify({
             "action": "make_guess",
-            "is_setup": setup_guess,
             "guess": guess})
     })
     

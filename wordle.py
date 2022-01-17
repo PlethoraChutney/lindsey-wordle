@@ -65,6 +65,10 @@ def make_guess(guess, session):
         temp.append(guess)
         session['prior_guesses'] = temp
 
+        temp = session['prior_answers']
+        temp.append(result)
+        session['prior_answers'] = temp
+
     answer_returns = {
         'real_word': True,
         'answers': result
@@ -92,10 +96,12 @@ def result():
             if session['word'] != word_and_time[0]:
                 session['word'] = word_and_time[0]
                 session['prior_guesses'] = []
+                session['prior_answers'] = []
                 session['word_generation_time'] = word_and_time[1]
         except KeyError:
             session['word'] = word_and_time[0]
             session['prior_guesses'] = []
+            session['prior_answers'] = []
             session['word_generation_time'] = word_and_time[1]
             
         use_dark_theme = request.args.get('theme') == 'dark'
@@ -112,9 +118,10 @@ def result():
 
         # get prior guesses
         elif req_json['action'] == 'setup':
-            return json.dumps(
-                session['prior_guesses']
-                ), 200, {'ContentType': 'application/json'}
+            return json.dumps([
+                session['prior_guesses'],
+                session['prior_answers']
+            ]), 200, {'ContentType': 'application/json'}
 
         # get emoji grid for sharing
         elif req_json['action'] == 'get_emoji_grid':
