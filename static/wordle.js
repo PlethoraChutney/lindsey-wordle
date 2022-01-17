@@ -178,11 +178,13 @@ async function getLeaderboard() {
                 title: {
                     text: 'Guesses to right answer'
                 }
-            }
+            },
+            height: 300
         };
 
         config = {
-            displayModeBar: false
+            displayModeBar: false,
+            responsive: true
         };
 
         Plotly.newPlot(leaderDiv, data, layout, config)
