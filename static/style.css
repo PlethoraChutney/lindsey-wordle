@@ -119,7 +119,7 @@ div.letter {
 
 #guesses .wrong {
     background-color: #F08C78;
-    color: unset;
+    color: white;
     transform: rotateY(180deg) scaleX(-1);
 }
 
@@ -271,6 +271,7 @@ div.winner-word {
     
     #guesses .wrong {
         background-color: #422E29;
+        color: inherit;
     }
     
     .correct {

@@ -24,6 +24,7 @@ div.letter, .keyboard-key {
 
 #guesses .wrong {
     background-color: #422E29;
+    color: inherit;
 }
 
 .correct {
