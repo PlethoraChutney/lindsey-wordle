@@ -205,6 +205,10 @@ div.winner-word {
     cursor: pointer;
 }
 
+#leaderboard-graph {
+    margin-bottom: 10px;
+}
+
 #emoji-grid {
     background-color: white;
     border: 1px solid black;

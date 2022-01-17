@@ -165,9 +165,16 @@ async function getLeaderboard() {
             }
         }];
 
+        var urlParams = new URLSearchParams(window.location.search);
+        let manual_dark_mode = urlParams.toString().includes('theme=dark');
+        let dark_scheme = window.matchMedia('(prefers-color-scheme: dark)').matches || manual_dark_mode;
+
         layout = {
             margin: {t:50},
-            title: 'Here\'s how other folks are doing!',
+            title: {
+                text: 'Here\'s how other folks are doing!',
+                font: {}
+            },
             yaxis: {
                 dtick: 1,
                 title: {
@@ -181,6 +188,16 @@ async function getLeaderboard() {
             },
             height: 300
         };
+
+        if (dark_scheme) {
+            layout['plot_bgcolor'] = '#151821';
+            layout['paper_bgcolor'] = '#151821';
+            layout['yaxis']['color'] = '#AAA';
+            layout['xaxis']['color'] = '#AAA';
+            layout['title']['font']['color'] = '#AAA';
+
+            data[0]['marker']['color'] = '#566FA3';
+        }
 
         config = {
             displayModeBar: false,
