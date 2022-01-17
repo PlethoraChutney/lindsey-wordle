@@ -17,6 +17,15 @@ word_and_time = [
     datetime.datetime.now()
 ]
 
+leaderboard_dict = {
+    1: 0,
+    2: 0,
+    3: 0,
+    4: 0,
+    5: 0,
+    6: 0
+}
+
 
 def check_real_word(word):
     checker = spellchecker.SpellChecker()
@@ -78,6 +87,9 @@ def make_guess(guess, session):
     else:
         answer_returns['word'] = False
 
+    if all([x == 'correct' for x in result]):
+        leaderboard_dict[len(session['prior_guesses'])] += 1
+
     return answer_returns
 
 @app.route('/', methods=['GET', 'POST'])
@@ -90,6 +102,8 @@ def result():
             word_and_time[0] = random.choice(word_list)
             session['prior_guesses'] = []
             word_and_time[1] = datetime.datetime.now()
+            for key in leaderboard_dict.keys():
+                leaderboard_dict[key] = 0
 
         # Update session, if necessary
         try:
@@ -130,3 +144,6 @@ def result():
             return json.dumps(
                 make_emoji_grid(session)
                 ), 200, {'ContentType': 'application/json'}
+
+        elif req_json['action'] == 'get_leaderboard':
+            return json.dumps(leaderboard_dict), 200, {'ContentType': 'application/json'}

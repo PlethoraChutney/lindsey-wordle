@@ -133,12 +133,69 @@ function correct_word(answer_array) {
     return answer_array.every((v) => v === 'correct');
 };
 
+// get leaderboard
+async function getLeaderboard() {
+    const response = await fetch(wordle_url, {
+        method: 'POST',
+        mode: 'cors',
+        cache: 'no-cache',
+        credentials: 'same-origin',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        redirect: 'follow',
+        referrerPolicy: 'no-referrer',
+        body: JSON.stringify({
+            "action": "get_leaderboard",
+        })
+    })
+
+    response.json().then((value) => {
+        leaderDiv = document.getElementById('leaderboard-graph');
+
+        data = [{
+            x: Object.keys(value),
+            y: Object.values(value),
+            type: 'bar',
+            marker: {
+                color: '#97B3F0',
+                line: {
+                    width: 1
+                }
+            }
+        }];
+
+        layout = {
+            margin: {t:50},
+            title: 'Here\'s how other folks are doing!',
+            yaxis: {
+                dtick: 1,
+                title: {
+                    text: 'Number of other wordlers'
+                }
+            },
+            xaxis: {
+                title: {
+                    text: 'Guesses to right answer'
+                }
+            }
+        };
+
+        config = {
+            displayModeBar: false
+        };
+
+        Plotly.newPlot(leaderDiv, data, layout, config)
+    })
+}
+
 // opening and closing of ending modal window
 
 function end_modal(message) {
     $('#modal-content p')
         .text(message);
     $('#end-modal').toggleClass('hidden');
+    getLeaderboard();
 };
 
 $('#close-modal').click(() => {
