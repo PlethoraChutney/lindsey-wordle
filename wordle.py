@@ -28,6 +28,10 @@ leaderboard_dict = {
 
 
 def check_real_word(word):
+    # corner case possible where target word isn't in spellchecker
+    if word in word_list:
+        return True
+
     checker = spellchecker.SpellChecker()
     return len(checker.unknown([word])) == 0
 
@@ -102,6 +106,9 @@ def result():
             word_and_time[0] = random.choice(word_list)
             session['prior_guesses'] = []
             word_and_time[1] = datetime.datetime.now()
+
+        # make new daily leaderboard
+        if datetime.datetime.today().day != word_and_time[1].day:
             for key in leaderboard_dict.keys():
                 leaderboard_dict[key] = 0
 

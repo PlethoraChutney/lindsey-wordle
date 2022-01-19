@@ -133,7 +133,7 @@ function correct_word(answer_array) {
     return answer_array.every((v) => v === 'correct');
 };
 
-// get leaderboard
+// get leaderboard, make graph
 async function getLeaderboard() {
     const response = await fetch(wordle_url, {
         method: 'POST',
@@ -172,7 +172,7 @@ async function getLeaderboard() {
         layout = {
             margin: {t:50},
             title: {
-                text: 'Here\'s how other folks are doing!',
+                text: 'Today\'s Wordle Scores',
                 font: {}
             },
             yaxis: {
