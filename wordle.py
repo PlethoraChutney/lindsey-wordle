@@ -174,23 +174,20 @@ multiplayer_words = {}
 def multiplayer():
     if request.method == 'GET':
 
-        try:
-            session_id = session['multiplayer_id']
-        except KeyError:
+        if 'multiplayer_id' not in session:
             session['multiplayer_id'] = uuid4().hex
-            session_id = session['multiplayer_id']
 
         use_dark_theme = request.args.get('theme') == 'dark'
 
-        if session_id not in multiplayer_words:
-            return render_template('multiplayer.html', night_theme = use_dark_theme)
+        return render_template('multiplayer.html', night_theme = use_dark_theme)
 
     elif request.method == 'POST':
         rj = request.get_json()
 
         if rj['action'] == 'setup':
             setup_data = {
-                'session_id': session['multiplayer_id']
+                'session_id': session['multiplayer_id'],
+                'has_game': session['multiplayer_id'] in session
             }
 
             return json.dumps(setup_data), 200, {'ContentType': 'application/json'}

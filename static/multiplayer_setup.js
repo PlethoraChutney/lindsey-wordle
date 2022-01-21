@@ -4,12 +4,13 @@ const MultiplayerApp = {
     data() {
         return {
             wordChoice: [
-                {id: 0, choice: 'Pick my own word', selected: true},
-                {id: 1, choice: 'Have Wordle pick for me', selected: false}
+                {id: 0, choice: 'Have Wordle pick for me', selected: true},
+                {id: 1, choice: 'Pick my own word', selected: false}
             ],
             selected: 0,
-            submitted: false,
-            sessionId: ''
+            sessionId: '',
+            hasGame: false,
+            ownWord: ''
         }
     },
     compilerOptions: {
@@ -48,4 +49,5 @@ async function optionsSetup(url = wordleUrl) {
 
 optionsSetup().then((value) => {
     vm.$data.sessionId = value.session_id;
+    vm.$data.hasGame = value.has_game;
 })

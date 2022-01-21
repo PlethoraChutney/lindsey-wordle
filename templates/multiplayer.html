@@ -21,7 +21,7 @@
 <body>
     <div id="wordle">
         <div id="setup-options">
-            <div v-if="!submitted">
+            <div v-if="!hasGame">
                 <h1>Multiplayer Wordle</h1>
                 <p>
                     Welcome to multiplayer wordle! To get started, set up your game below.
@@ -36,6 +36,13 @@
                     class="button"
                     >
                         [[option.choice]]
+                    </div>
+                </div>
+                <hr>
+                <div id="submission">
+                    <div id="word-picker" v-if="selected === 1">
+                        <p>If you pick your own word you won't be able to play along!</p>
+                        <input type="text" v-model="ownWord">
                     </div>
                 </div>
             </div>
