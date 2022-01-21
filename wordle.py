@@ -5,6 +5,7 @@ import os
 import datetime
 import spellchecker
 import logging
+from uuid import uuid4
 
 app = Flask(__name__)
 try:
@@ -101,22 +102,27 @@ def make_guess(guess, session):
 
     return answer_returns
 
+def check_for_updates():
+
+    # make new daily leaderboard
+    if datetime.datetime.today().day != word_and_time[1].day:
+        for key in leaderboard_dict.keys():
+            leaderboard_dict[key] = 0
+
+    # detect if new word needed
+    time_since_word = datetime.datetime.now() - word_and_time[1]
+    if time_since_word.total_seconds() > 30 * 60:
+        word_and_time[0] = random.choice(word_list)
+        session['prior_guesses'] = []
+        word_and_time[1] = datetime.datetime.now()
+
+
 @app.route('/', methods=['GET', 'POST'])
-def result():
+def index():
     # build the page
     if request.method == 'GET':
 
-        # make new daily leaderboard
-        if datetime.datetime.today().day != word_and_time[1].day:
-            for key in leaderboard_dict.keys():
-                leaderboard_dict[key] = 0
-
-        # detect if new word needed
-        time_since_word = datetime.datetime.now() - word_and_time[1]
-        if time_since_word.total_seconds() > 30 * 60:
-            word_and_time[0] = random.choice(word_list)
-            session['prior_guesses'] = []
-            word_and_time[1] = datetime.datetime.now()
+        check_for_updates()
 
         # Update session, if necessary
         try:
@@ -160,3 +166,32 @@ def result():
 
         elif req_json['action'] == 'get_leaderboard':
             return json.dumps(leaderboard_dict), 200, {'ContentType': 'application/json'}
+
+
+multiplayer_words = {}
+
+@app.route('/multiplayer', methods = ['GET', 'POST'])
+def multiplayer():
+    if request.method == 'GET':
+
+        try:
+            session_id = session['multiplayer_id']
+        except KeyError:
+            session['multiplayer_id'] = uuid4().hex
+            session_id = session['multiplayer_id']
+
+        use_dark_theme = request.args.get('theme') == 'dark'
+
+        if session_id not in multiplayer_words:
+            return render_template('multiplayer.html', night_theme = use_dark_theme)
+
+    elif request.method == 'POST':
+        rj = request.get_json()
+
+        if rj['action'] == 'setup':
+            setup_data = {
+                'session_id': session['multiplayer_id']
+            }
+
+            return json.dumps(setup_data), 200, {'ContentType': 'application/json'}
+

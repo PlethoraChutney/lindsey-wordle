@@ -1,0 +1,34 @@
+#setup-options {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+}
+
+#option-container, #word-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+}
+
+.button {
+    max-width: 600px;
+    font-size: 14pt;
+    font-family: Outfit, sans-serif;
+    border: 1px solid black;
+    padding: 5px;
+    background-color: white;
+    cursor: pointer;
+    user-select: none;
+    width: max-content;
+}
+
+.button.selected {
+    background-color: #97B3F0;
+}
+
+@media (pointer: fine) {
+    .button:hover {
+        filter:brightness(90%);
+    }
+}
+

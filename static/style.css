@@ -5,7 +5,7 @@
     light green: #C7F07D,
     green: #AABF82 */
 
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Righteous&family=Roboto+Condensed:wght@300&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit&family=Playfair+Display:wght@600&display=swap');
 
 body {
     display: flex;
@@ -22,6 +22,12 @@ h1 {
     line-height: 3rem;
     padding-top: 10px;
     margin-top: 0;
+}
+
+p {
+    max-width: 600px;
+    font-size: 18pt;
+    font-family: Outfit, sans-serif;
 }
 
 #wordle {
