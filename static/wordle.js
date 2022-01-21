@@ -1,6 +1,6 @@
 const guessesDiv = document.getElementById('guesses');
 const keyboardDiv = document.getElementById('keyboard');
-const wordle_url = '/';
+const wordle_url = window.location.href;
 var word_guessed = false;
 
 // Create the guess area

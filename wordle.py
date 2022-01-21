@@ -4,9 +4,14 @@ import random
 import os
 import datetime
 import spellchecker
+import logging
 
 app = Flask(__name__)
-app.secret_key = os.environ['SESSION_KEY']
+try:
+    app.secret_key = os.environ['SESSION_KEY']
+except KeyError:
+    logging.warning('$SECRET_KEY not in environment.')
+    app.secret_key = 'BAD_SECRET_KEY_FOR_DEVELOPMENT'
 
 with open('words.json', 'r') as f:
     word_list = json.load(f)
