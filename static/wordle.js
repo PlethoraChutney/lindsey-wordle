@@ -176,7 +176,7 @@ async function getLeaderboard() {
                 font: {}
             },
             yaxis: {
-                dtick: 1,
+                dtick: 2,
                 title: {
                     text: 'Number of other wordlers'
                 }

@@ -100,17 +100,18 @@ def make_guess(guess, session):
 def result():
     # build the page
     if request.method == 'GET':
+
+        # make new daily leaderboard
+        if datetime.datetime.today().day != word_and_time[1].day:
+            for key in leaderboard_dict.keys():
+                leaderboard_dict[key] = 0
+
         # detect if new word needed
         time_since_word = datetime.datetime.now() - word_and_time[1]
         if time_since_word.total_seconds() > 30 * 60:
             word_and_time[0] = random.choice(word_list)
             session['prior_guesses'] = []
             word_and_time[1] = datetime.datetime.now()
-
-        # make new daily leaderboard
-        if datetime.datetime.today().day != word_and_time[1].day:
-            for key in leaderboard_dict.keys():
-                leaderboard_dict[key] = 0
 
         # Update session, if necessary
         try:
