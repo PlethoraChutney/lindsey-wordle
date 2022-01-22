@@ -149,6 +149,12 @@ def index():
                 make_guess(req_json['guess'].lower(), session)
                 ), 200, {'ContentType': 'application/json'}
 
+        # just check a word
+        elif req_json['action'] == 'check_word':
+            return json.dumps(
+                {'is_word': check_real_word(req_json['word'])}
+            ), 200, {'ContentType': 'application/json'}
+
         # get prior guesses
         elif req_json['action'] == 'setup':
             setup_lists = [session['prior_guesses'], session['prior_answers']]

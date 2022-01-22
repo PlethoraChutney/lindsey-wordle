@@ -10,7 +10,50 @@ const MultiplayerApp = {
             selected: 0,
             sessionId: '',
             hasGame: false,
-            ownWord: ''
+            ownWord: '',
+            isValidWord: false
+        }
+    },
+    computed: {
+        validWordEmoji() {
+            return this.isValidWord ? '✔️' : '❌'
+        },
+        validWordHover() {
+            return 'Hover text'
+        }
+    },
+    watch: {
+        ownWord(newWord) {
+            if (this.ownWord.length !== 5) {
+                this.isValidWord = false;
+            } else {
+                this.checkRealWord(newWord);
+            }
+        }
+    },
+    methods: {
+        checkRealWord(word) {
+            this.isValidWord = false;
+
+            fetch('/', {
+                method: 'POST',
+                mode: 'cors',
+                cache: 'no-cache',
+                credentials: 'same-origin',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                redirect: 'follow',
+                referrerPolicy: 'no-referrer',
+                body: JSON.stringify({
+                    "action": "check_word",
+                    "word": word})
+            }).then(response => 
+                response.json()
+                .then(data => 
+                    this.isValidWord = data.is_word
+                )
+            );
         }
     },
     compilerOptions: {

@@ -32,7 +32,7 @@
                     v-for="option in wordChoice"
                     :key="option.id"
                     :id="`word-choice-${option.id}`"
-                    :class="{selected: option.id === selected}"
+                    :class="{selected: option.id === selected, valid: option.id !== selected}"
                     class="button"
                     >
                         [[option.choice]]
@@ -41,8 +41,18 @@
                 <hr>
                 <div id="submission">
                     <div id="word-picker" v-if="selected === 1">
-                        <p>If you pick your own word you won't be able to play along!</p>
-                        <input type="text" v-model="ownWord">
+                        <div>
+                            <p>If you pick your own word you won't be able to play along!</p>
+                            <input type="text" v-model="ownWord">
+                            <p>[[validWordEmoji]]</p>
+                        </div>
+                        <hr>
+                    </div>
+                    <div id="submit">
+                        <div
+                        class="button"
+                        :class="{valid: selected === 0 || isValidWord}"
+                        >Submit</div>
                     </div>
                 </div>
             </div>
