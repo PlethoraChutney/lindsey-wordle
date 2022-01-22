@@ -100,9 +100,16 @@ const vm = Vue.createApp(MultiplayerApp).mount('#wordle');
 // haha I think now it might have been just that I don't know how to use
 // devtools but I got this working so that's how it's gonna be.
 $('#option-container .button').click(function() {
-    vm.$data.selected = parseInt($(this)
-        .attr('id')
-        .split('-')[2]);
+    choice = parseInt($(this)
+    .attr('id')
+    .split('-')[2]);
+    vm.$data.selected = choice;
+
+    window.setTimeout(() => {
+        if (choice === 1) {
+            $('#word-input').focus();
+        }
+    }, 100);
 });
 
 async function optionsSetup(url = wordleUrl) {
