@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, session
+from flask import Flask, render_template, request, session, redirect
 import json
 import random
 import os
@@ -175,8 +175,8 @@ def index():
 
 
 multiplayer_words = {}
-@app.route('/multiplayer', methods = ['GET', 'POST'])
-def multiplayer():
+@app.route('/multiplayer/', methods = ['GET', 'POST'])
+def multiplayer_setup():
     if request.method == 'GET':
 
         if 'multiplayer_id' not in session:
@@ -223,4 +223,12 @@ def multiplayer():
             }), 200, {'ContentType': 'application/json'}
 
                 
+@app.route('/multiplayer/game', methods = ['GET', 'POST'])
+def multiplayer_game():
+    game_id = request.args.get('id')
+    if game_id is None:
+        return redirect('/multiplayer')
 
+    game_info = multiplayer_words[game_id]
+
+    return json.dumps(game_info), 200, {'ContentType': 'application/json'}
