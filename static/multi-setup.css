@@ -74,11 +74,11 @@ hr {
 
 #submit {
     display: flex;
-    flex-direction: row;
-    justify-content: center;
+    flex-direction: column;
+    justify-content: flex-start;
     align-items: center;
 }
 
 #submit > .button {
-    width: 100%;
+    width: 90%;
 }

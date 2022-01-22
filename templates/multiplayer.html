@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename = 'multi-setup.css') }}">
     {% if night_theme %}
     <link rel="stylesheet" href="{{ url_for('static', filename = 'night_theme.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename = 'multi_night_theme.css') }}">
     {% endif %}
     <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename = '/apple-touch-icon.png') }}">
     <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename = '/favicon-32x32.png') }}">
@@ -21,12 +22,16 @@
 <body>
     <div id="wordle">
         <div id="setup-options">
-            <div v-if="!hasGame">
+            <div>
                 <h1>Multiplayer Wordle</h1>
                 <p>
                     Welcome to multiplayer wordle! To get started, set up your game below.
                     When you're finished, a unique URL will be generated to share your game!
                 </p>
+                <div v-if="hasGame && !showPostSetup">
+                    <p>If you're looking for your current game,
+                        <a :href="[[gameURL]]">it's over here!</a></p>
+                </div>
                 <div id="option-container">
                     <div
                     v-for="option in wordChoice"
@@ -52,8 +57,17 @@
                         <div
                         class="button"
                         :class="{valid: selected === 0 || isValidWord}"
-                        >Submit</div>
+                        @click="submitWord"
+                        >
+                        [[submitButtonText]]
+                        </div>
                     </div>
+                    </div>
+                </div>
+                <div v-if="showPostSetup">
+                    <p>Okay, you're good to go! Your game can be found
+                        <a :href="[[gameURL]]">here!</a>
+                    </p>
                 </div>
             </div>
         </div>

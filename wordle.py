@@ -175,7 +175,6 @@ def index():
 
 
 multiplayer_words = {}
-
 @app.route('/multiplayer', methods = ['GET', 'POST'])
 def multiplayer():
     if request.method == 'GET':
@@ -189,12 +188,39 @@ def multiplayer():
 
     elif request.method == 'POST':
         rj = request.get_json()
+        use_theme = request.args.get('theme')
+        sess_id = session.get('multiplayer_id')
 
         if rj['action'] == 'setup':
+            has_game = sess_id in multiplayer_words
             setup_data = {
-                'session_id': session['multiplayer_id'],
-                'has_game': session['multiplayer_id'] in session
+                'has_game': has_game
             }
 
+            if has_game:
+                setup_data['url'] = f'/multiplayer/game?id={sess_id}&theme={use_theme}'
+
             return json.dumps(setup_data), 200, {'ContentType': 'application/json'}
+
+        elif rj['action'] == 'make_new_game':
+            if rj['custom_word']:
+                assert check_real_word(rj['word'])
+                word = rj['word']
+            else:
+                word = random.choice(word_list)
+
+            multiplayer_words[sess_id] = {
+                'word': word,
+                'custom': rj['custom_word'],
+                'guesses': [],
+                'answers': []
+            }
+
+            game_url = f'/multiplayer/game?id={sess_id}&theme={use_theme}'
+
+            return json.dumps({
+                'url': game_url
+            }), 200, {'ContentType': 'application/json'}
+
+                
 

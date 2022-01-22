@@ -1,0 +1,23 @@
+body,
+html {
+    color: #aaa;
+}
+
+.button {
+    background-color: #666;
+    color: #dfdfdf;
+}
+
+.button.valid {
+    background-color: #7E8A69;
+}
+
+.button.selected {
+    background-color: #767C8A;
+}
+
+input {
+    background-color: unset;
+    border: 1px solid #ddd;
+    color: #dfdfdf
+}

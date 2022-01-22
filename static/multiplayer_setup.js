@@ -8,8 +8,9 @@ const MultiplayerApp = {
                 {id: 1, choice: 'Pick my own word', selected: false}
             ],
             selected: 0,
-            sessionId: '',
             hasGame: false,
+            showPostSetup: false,
+            gameURL: '',
             ownWord: '',
             isValidWord: false
         }
@@ -20,6 +21,9 @@ const MultiplayerApp = {
         },
         validWordHover() {
             return 'Hover text'
+        },
+        submitButtonText() {
+            return this.hasGame ? 'Overwrite old game' : 'Submit'
         }
     },
     watch: {
@@ -54,6 +58,34 @@ const MultiplayerApp = {
                     this.isValidWord = data.is_word
                 )
             );
+        },
+        submitWord() {
+            if (!this.isValidWord && this.selected === 1) {
+                return false;
+            }
+
+            fetch(wordleUrl, {
+                method: 'POST',
+                mode: 'cors',
+                cache: 'no-cache',
+                credentials: 'same-origin',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                redirect: 'follow',
+                referrerPolicy: 'no-referrer',
+                body: JSON.stringify({
+                    "action": "make_new_game",
+                    "custom_word": this.selected === 1,
+                    "word": this.ownWord})
+            }).then(response => 
+                response.json()
+                .then(data => {
+                    this.gameURL = data.url
+                    this.showPostSetup = true
+                })
+            );
+
         }
     },
     compilerOptions: {
@@ -61,7 +93,7 @@ const MultiplayerApp = {
     }
 };
 
-const vm = Vue.createApp(MultiplayerApp).mount('#setup-options');
+const vm = Vue.createApp(MultiplayerApp).mount('#wordle');
 
 // I know this is dumb but I couldn't get the methods to work, so
 //
@@ -91,6 +123,6 @@ async function optionsSetup(url = wordleUrl) {
 };
 
 optionsSetup().then((value) => {
-    vm.$data.sessionId = value.session_id;
     vm.$data.hasGame = value.has_game;
+    vm.$data.gameURL = value.url;
 })
