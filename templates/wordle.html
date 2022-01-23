@@ -23,11 +23,25 @@
         <div id="guesses">
         </div>
         <div id="keyboard">
-            <div
-                v-for="i in [0, 1, 2]"
-            >
+            <div>
                 <keyboard-key
-                    v-for="letter of keyboardKeys[i]"
+                    v-for="letter of Object.values(keyboardKeys).slice(0,10)"
+                    v-bind:key="letter.id"
+                    v-bind:key-letter="letter.keyLetter"
+                    v-bind:usage="letter.state"
+                ></keyboard-key>
+            </div>
+            <div>
+                <keyboard-key
+                    v-for="letter of Object.values(keyboardKeys).slice(10,19)"
+                    v-bind:key="letter.id"
+                    v-bind:key-letter="letter.keyLetter"
+                    v-bind:usage="letter.state"
+                ></keyboard-key>
+            </div>
+            <div>
+                <keyboard-key
+                    v-for="letter of Object.values(keyboardKeys).slice(19, 28)"
                     v-bind:key="letter.id"
                     v-bind:key-letter="letter.keyLetter"
                     v-bind:usage="letter.state"

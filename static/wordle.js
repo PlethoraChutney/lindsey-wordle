@@ -366,7 +366,10 @@ const KeyboardKey = {
 const wordle = Vue.createApp({
     data() {
         return {
-            'keyboardKeys': [[], [], []]
+            'keyboardKeys': {},
+            'guesses': [
+                {}
+            ]
         }
     },
     components: {
@@ -379,26 +382,37 @@ const wordle = Vue.createApp({
 
 const vm = wordle.mount('#wordle');
 
-for (let i = 0; i <= 9; i++) {
-    vm.$data.keyboardKeys[0].push({
-        id: i,
-        keyLetter: 'QWERTYUIOP'.charAt(i),
+
+// set up keyboard
+for (let i = 0; i <= 18; i++) {
+    let char = 'QWERTYUIOPASDFGHJKL'.charAt(i);
+    vm.$data.keyboardKeys[char] = {
+        id: char,
+        keyLetter: char,
         state: 'unused'
-    })
+    }
+};
+
+vm.$data.keyboardKeys['Enter'] = {
+    id: 'Enter',
+    keyLetter: 'Enter',
+    state: 'unused'
 };
 
 for (let i = 0; i <= 8; i++) {
-    vm.$data.keyboardKeys[1].push({
-        id: i + 10,
-        keyLetter: 'ASDFGHJKL'.charAt(i),
+    let char = 'ZXCVBNM'.charAt(i);
+    vm.$data.keyboardKeys[char] = {
+        id: char,
+        keyLetter: char,
         state: 'unused'
-    })
+    }
 };
 
-for (let i = 0; i <= 8; i++) {
-    vm.$data.keyboardKeys[2].push({
-        id: i + 19,
-        keyLetter: ['Enter', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', 'Del'][i],
-        state: 'unused'
-    })
+vm.$data.keyboardKeys['Del'] = {
+    id: 'Del',
+    keyLetter: 'Del',
+    state: 'unused'
 };
+
+// Not sure where this blank element comes from but this is easier than finding out
+delete vm.$data.keyboardKeys['']
