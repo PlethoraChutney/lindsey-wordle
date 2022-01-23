@@ -41,19 +41,12 @@ p {
 }
 
 #guesses {
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: center;
-    height: auto;
-    min-height: 0;
-}
-
-.guess {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-around;
-    align-items: center;
+    display: grid;
+    grid-template-rows: repeat(6, 1fr);
+    grid-template-columns: repeat(5, 1fr);
+    font-weight: bold;
+    width: min-content;
+    align-self: center;
 }
 
 div.letter {
@@ -117,10 +110,6 @@ div.letter {
 #keyboard .wrong {
     background-color: #DDDDDD;
     color: #888888;
-}
-
-#guesses {
-    font-weight: bold;
 }
 
 #guesses .wrong {

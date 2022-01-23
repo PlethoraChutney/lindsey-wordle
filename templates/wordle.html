@@ -21,6 +21,12 @@
     <div id="wordle">
         <h1>Lindsey's Wordle</h1>
         <div id="guesses">
+            <letter-slot
+                v-for="slot in letterSlots"
+                :key="slot.id"
+                :letter-guess="slot.letter"
+                :answer="slot.state"
+            ></letter-slot>
         </div>
         <div id="keyboard">
             <div>

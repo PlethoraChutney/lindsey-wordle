@@ -363,17 +363,21 @@ const KeyboardKey = {
     template: `<div class="keyboard-key" :class="usage">{{ keyLetter }}</div>`
 }
 
+const LetterSlot = {
+    props: ['letterGuess', 'answer'],
+    template: `<div class="letter" :class="answer">{{ letterGuess }}</div>`
+}
+
 const wordle = Vue.createApp({
     data() {
         return {
             'keyboardKeys': {},
-            'guesses': [
-                {}
-            ]
+            'letterSlots': []
         }
     },
     components: {
-        KeyboardKey
+        KeyboardKey,
+        LetterSlot
     },
     compilerOptions: {
         delimiters: ['[[', ']]']
@@ -416,3 +420,12 @@ vm.$data.keyboardKeys['Del'] = {
 
 // Not sure where this blank element comes from but this is easier than finding out
 delete vm.$data.keyboardKeys['']
+
+// make guess slots
+for (let i = 0; i < 30; i++) {
+    vm.letterSlots.push({
+        id: `ls-${i}`,
+        letter: ' ',
+        state: null
+    })
+}
