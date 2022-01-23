@@ -23,6 +23,16 @@
         <div id="guesses">
         </div>
         <div id="keyboard">
+            <div
+                v-for="i in [0, 1, 2]"
+            >
+                <keyboard-key
+                    v-for="letter of keyboardKeys[i]"
+                    v-bind:key="letter.id"
+                    v-bind:key-letter="letter.keyLetter"
+                    v-bind:usage="letter.state"
+                ></keyboard-key>
+            </div>
         </div>
     </div>
     <div id="end-modal" class="hidden">
@@ -42,5 +52,6 @@
 </body>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
 <script src="https://cdn.plot.ly/plotly-2.8.3.min.js"></script>
+<script src="https://unpkg.com/vue@v3.2.27"></script>
 <script src="{{ url_for('static', filename = 'wordle.js') }}"></script>
 </html>

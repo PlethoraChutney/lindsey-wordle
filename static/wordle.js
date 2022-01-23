@@ -1,56 +1,5 @@
-const guessesDiv = document.getElementById('guesses');
-const keyboardDiv = document.getElementById('keyboard');
 const wordle_url = window.location.href;
 var word_guessed = false;
-
-// Create the guess area
-
-for (let i = 0; i < 6; i++) {
-    let new_guess = document.createElement('div');
-    new_guess.setAttribute('id', 'guess-' + i);
-    new_guess.className = 'guess';
-
-    for (let j = 0; j < 5; j++) {
-        let letter = document.createElement('div');
-        letter.classList.add('letter');
-        letter.classList.add('column-' + j)
-        letter.id = 'position-' + (10*i + j);
-        new_guess.appendChild(letter);
-    }
-
-    guessesDiv.appendChild(new_guess);
-};
-
-// create keyboard
-
-for (const row of ['QWERTYUIOP', 'ASDFGHJKL', '<ZXCVBNM>']) {
-    const newRow = document.createElement('div')
-    for (let char of row) {
-        if (char === '<') {
-            char = 'Enter';
-        } else if (char === '>') {
-            char = 'Del';
-        }
-        const newKey = document.createElement('div');
-        newKey.setAttribute('id', 'key-' + char);
-        newKey.classList.add('keyboard-key', 'unused');
-
-        const letterNode = document.createTextNode(char);
-        newKey.appendChild(letterNode);
-        newRow.appendChild(newKey);
-    }
-    keyboardDiv.appendChild(newRow);
-};
-
-$('.keyboard-key').click(function() {
-    var keyPressed = $(this).text();
-    read_key(keyPressed);
-});
-
-$('.keyboard-key').on('tap', function() {
-    var keyPressed = $(this).text();
-    read_key(keyPressed);
-});
 
 // setup:
 //  - Get the prior guesses, then run them as a guess to "set the board"
@@ -408,3 +357,48 @@ $('#grid-actual').click(() => {
         document.getElementById('grid-actual')
     );
 });
+
+const KeyboardKey = {
+    props: ['keyLetter', 'usage'],
+    template: `<div class="keyboard-key" :class="usage">{{ keyLetter }}</div>`
+}
+
+const wordle = Vue.createApp({
+    data() {
+        return {
+            'keyboardKeys': [[], [], []]
+        }
+    },
+    components: {
+        KeyboardKey
+    },
+    compilerOptions: {
+        delimiters: ['[[', ']]']
+    }
+});
+
+const vm = wordle.mount('#wordle');
+
+for (let i = 0; i <= 9; i++) {
+    vm.$data.keyboardKeys[0].push({
+        id: i,
+        keyLetter: 'QWERTYUIOP'.charAt(i),
+        state: 'unused'
+    })
+};
+
+for (let i = 0; i <= 8; i++) {
+    vm.$data.keyboardKeys[1].push({
+        id: i + 10,
+        keyLetter: 'ASDFGHJKL'.charAt(i),
+        state: 'unused'
+    })
+};
+
+for (let i = 0; i <= 8; i++) {
+    vm.$data.keyboardKeys[2].push({
+        id: i + 19,
+        keyLetter: ['Enter', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', 'Del'][i],
+        state: 'unused'
+    })
+};
