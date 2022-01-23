@@ -4,16 +4,16 @@ html {
 }
 
 .button {
-    background-color: #666;
-    color: #dfdfdf;
+    background-color: #1B1C29;
+    color: #666;
 }
 
 .button.valid {
-    background-color: #7E8A69;
+    background-color: #1F291C;
 }
 
 .button.selected {
-    background-color: #767C8A;
+    background-color: #1B1C29;
 }
 
 input {

@@ -82,3 +82,29 @@ hr {
 #submit > .button {
     width: 90%;
 }
+
+@media (prefers-color-scheme: dark) {
+    body,
+    html {
+        color: #aaa;
+    }
+
+    .button {
+        background-color: #1B1C29;
+        color: #666;
+    }
+
+    .button.valid {
+        background-color: #1F291C;
+    }
+
+    .button.selected {
+        background-color: #1B1C29;
+    }
+
+    input {
+        background-color: unset;
+        border: 1px solid #ddd;
+        color: #dfdfdf
+    }
+}
