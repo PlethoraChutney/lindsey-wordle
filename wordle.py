@@ -138,6 +138,7 @@ def index():
             session['word_generation_time'] = word_and_time[1]
             
         use_dark_theme = request.args.get('theme') == 'dark'
+        app.logger.debug(word_and_time[0])
         return render_template('wordle.html', night_theme = use_dark_theme)
 
     elif request.method == 'POST':

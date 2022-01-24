@@ -257,6 +257,13 @@ const wordle = Vue.createApp({
                 this.wordSlots[this.currentWord].slot_class.pop();
             }, 750)
         },
+        winnerWord() {
+            for (let i = 0; i < 5; i ++) {
+                window.setTimeout(() => {
+                    this.wordSlots[this.currentWord - 1].states[i] = this.wordSlots[this.currentWord - 1].states[i] + ' winner-word'
+                }, 125 * i);
+            }
+        },
         updateGuessStates(slot, newStates, newLetters = this.wordSlots[slot].word) {
             for (let i = 0; i < 5; i ++) {
                 window.setTimeout(() => {
