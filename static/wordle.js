@@ -4,8 +4,8 @@ const wordle_url = window.location.href;
 //  - Get the prior guesses, then run them as a guess to "set the board"
 //  - Also create the current_guess variable and set it to the proper number
 
-async function getSetup(url = url) {
-    const response = await fetch(url, {
+function sendRequest(body) {
+    return fetch(wordle_url, {
         method: 'POST',
         mode: 'cors',
         cache: 'no-cache',
@@ -15,88 +15,13 @@ async function getSetup(url = url) {
         },
         redirect: 'follow',
         referrerPolicy: 'no-referrer',
-        body: JSON.stringify({"action": "setup"})
+        body: JSON.stringify(body)
     })
-
-    return response.json();
-};
-
-function setup_word(word, guesses, answer) {
-    const thisGuess = current_guess;
-    const row = document.getElementById('guess-' + thisGuess);
-    current_guess++;
-
-    for (let i = 0; i < guesses.length; i++) {
-        window.setTimeout(() => {
-            row.children[i].classList.add(guesses[i]);
-            row.children[i].innerHTML = word.charAt(i).toUpperCase();
-
-            let keyboardKey = document.getElementById('key-' + word.charAt(i).toUpperCase());
-            if (guesses[i] === 'correct' || keyboardKey.className === 'keyboard-key correct') {
-                keyboardKey.className = 'keyboard-key correct';
-            } else if (guesses[i] === 'position' || keyboardKey.className === 'keyboard-key position') {
-                keyboardKey.className = 'keyboard-key position';
-            } else if (guesses[i] === 'wrong') {
-                keyboardKey.className = 'keyboard-key wrong';
-            }
-        }, 250 * i);
-    }
-
-    window.setTimeout(() => {
-        if (correct_word(guesses)) {
-            word_guessed = true;
-            for (let i = 0; i < guesses.length; i++) {
-                window.setTimeout(() => {
-                    row.children[i].classList.add('winner-word');
-                }, 75 * i)
-            }
-            window.setTimeout(() => {
-                end_modal('You did it! Nice work!');
-            }, 1750);
-        } else if (thisGuess == 5) {
-            end_modal(`Sorry, better luck next time!\nThe word was ${answer}`);
-        }
-    }, 1750);
-
 }
-
-let current_guess = 0;
-let previous_guesses = [];
-
-getSetup(wordle_url).then((response) => {
-    words = response[0];
-    guesses = response[1];
-    answer = response[2];
-
-
-    for (let i = 0; i < guesses.length; i++) {
-        setup_word(words[i], guesses[i], answer);
-        previous_guesses.push(words[i]);
-    }
-
-    return words;
-});
-
-function correct_word(answer_array) {
-    return answer_array.every((v) => v === 'correct');
-};
 
 // get leaderboard, make graph
 async function getLeaderboard() {
-    const response = await fetch(wordle_url, {
-        method: 'POST',
-        mode: 'cors',
-        cache: 'no-cache',
-        credentials: 'same-origin',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        redirect: 'follow',
-        referrerPolicy: 'no-referrer',
-        body: JSON.stringify({
-            "action": "get_leaderboard",
-        })
-    })
+    const response = await sendRequest({'action': 'get_leaderboard'});
 
     response.json().then((value) => {
         leaderDiv = document.getElementById('leaderboard-graph');
@@ -179,79 +104,6 @@ $('#modal-content').click(function(e) {
 
 $('#emoji-grid').click(getEmojiGrid);
 
-async function make_guess(guess = '') {
-    // Keep track of which guess this request corresponds to (for async)
-    const thisGuess = current_guess;
-    const row = document.getElementById('guess-' + thisGuess);
-    current_guess++;
-    console.log(previous_guesses);
-
-    if (previous_guesses.includes(guess.toLocaleLowerCase())) {
-        row.classList.add('not-a-word');
-        current_guess--;
-        setTimeout(() => {row.classList.remove('not-a-word')}, 500);
-        return false;
-    }
-
-    const response = await fetch(wordle_url, {
-        method: 'POST',
-        mode: 'cors',
-        cache: 'no-cache',
-        credentials: 'same-origin',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        redirect: 'follow',
-        referrerPolicy: 'no-referrer',
-        body: JSON.stringify({
-            "action": "make_guess",
-            "guess": guess})
-    })
-    
-    response.json().then((value) => {
-        if (value.real_word) {
-            previous_guesses.push(guess.toLocaleLowerCase());
-            for (let i = 0; i < value.answers.length; i++) {
-                window.setTimeout(() => {
-                    row.children[i].classList.add(value.answers[i]);
-                    row.children[i].innerHTML = guess.charAt(i).toUpperCase();
-                }, 250 * i);
-
-                let keyboardKey = document.getElementById('key-' + guess.charAt(i).toUpperCase());
-                if (value.answers[i] === 'correct' || keyboardKey.className === 'keyboard-key correct') {
-                    keyboardKey.className = 'keyboard-key correct';
-                } else if (value.answers[i] === 'position' || keyboardKey.className === 'keyboard-key position') {
-                    keyboardKey.className = 'keyboard-key position';
-                } else if (value.answers[i] === 'wrong') {
-                    keyboardKey.className = 'keyboard-key wrong';
-                }
-            }
-            working_guess = [];
-
-            window.setTimeout(() => {
-                if (correct_word(value.answers)) {
-                    word_guessed = true;
-                    for (let i = 0; i < value.answers.length; i++) {
-                        window.setTimeout(() => {
-                            row.children[i].classList.add('winner-word');
-                        }, 75 * i)
-                    }
-                    window.setTimeout(() => {
-                        end_modal('You did it! Nice work!');
-                    }, 1750);
-                } else if (value.word && thisGuess == 5) {
-                    end_modal('Sorry, better luck next time!\nThe word was ' + value.word + '.');
-                }
-            }, 1750);
-
-        } else {
-            row.classList.add('not-a-word');
-            current_guess--;
-            setTimeout(() => {row.classList.remove('not-a-word')}, 500);
-        }
-    })
-};
-
 // Stolen from https://stackoverflow.com/questions/400212/how-do-i-copy-to-the-clipboard-in-javascript
 
 function fallbackClipboard(text) {
@@ -291,18 +143,7 @@ function copyTextToClipboard(text) {
 
 // make emoji grid
 async function getEmojiGrid() {
-    const response = await fetch(wordle_url, {
-        method: 'POST',
-        mode: 'cors',
-        cache: 'no-cache',
-        credentials: 'same-origin',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        redirect: 'follow',
-        referrerPolicy: 'no-referrer',
-        body: JSON.stringify({"action": "get_emoji_grid"})
-    })
+    const response = await sendRequest({'action': 'get_emoji_grid'});
 
     response.json().then((value) => {
         document.getElementById('grid-actual')
@@ -335,7 +176,7 @@ const LetterSlot = {
 }
 
 const WordSlot = {
-    props: ['letters', 'states'],
+    props: ['letters', 'states', 'slot-class'],
     components: {LetterSlot},
     template: `
         <div
@@ -356,39 +197,94 @@ const wordle = Vue.createApp({
         return {
             'keyboardKeys': {},
             'wordSlots': [
-                {id: 0, word: [], states: Array(5).fill('unused')},
-                {id: 1, word: [], states: Array(5).fill('unused')},
-                {id: 2, word: [], states: Array(5).fill('unused')},
-                {id: 3, word: [], states: Array(5).fill('unused')},
-                {id: 4, word: [], states: Array(5).fill('unused')},
-                {id: 5, word: [], states: Array(5).fill('unused')}
+                {id: 0, word: [], states: Array(5).fill('unused'), slot_class: []},
+                {id: 1, word: [], states: Array(5).fill('unused'), slot_class: []},
+                {id: 2, word: [], states: Array(5).fill('unused'), slot_class: []},
+                {id: 3, word: [], states: Array(5).fill('unused'), slot_class: []},
+                {id: 4, word: [], states: Array(5).fill('unused'), slot_class: []},
+                {id: 5, word: [], states: Array(5).fill('unused'), slot_class: []}
             ],
-            'currentWord': 0,
-            'wordGuessed': false
+            'currentWord': 0
         }
     },
     components: {
         KeyboardKey,
         WordSlot
     },
+    computed: {
+        wordGuessed() {
+            if (this.currentWord === 6) {
+                return true
+            }
+
+            for (let i = 0; i <= 5; i++) {
+                if (this.wordSlots[i].states.every(v => v === 'correct')) {
+                    return true
+                }
+            }
+
+            return false
+        },
+        previousGuesses() {
+            let guesses = [];
+            for (let i = 0; i < this.currentWord; i++) {
+                guesses.push(this.wordSlots[i].word.join(''));
+            }
+
+            return guesses;
+        }
+    },
     methods: {
         handleKeypress(keypress) {
-            if (this.word_guessed) {
+            if (this.wordGuessed) {
                 return true;
             }
             
             if (keypress.toUpperCase() === 'BACKSPACE' || keypress.toUpperCase() === 'DEL') {
                 this.wordSlots[this.currentWord].word.pop();
             } else if (keypress.toUpperCase() === 'ENTER') {
-                if (this.wordSlots[this.currentWord].word.length === 5) {
-                    this.makeGuess();
+                currentWord = this.wordSlots[this.currentWord].word.join('');
+                if (currentWord.length === 5) {
+                    this.makeGuess(currentWord);
                 }
             } else if (this.wordSlots[this.currentWord].word.length < 5) {
                 this.wordSlots[this.currentWord].word.push(keypress.toUpperCase());
             }
         },
-        makeGuess() {
-            console.log('Making guess');
+        notAWord() {
+            this.wordSlots[this.currentWord].slot_class.push('not-a-word');
+            window.setTimeout(() => {
+                this.wordSlots[this.currentWord].slot_class.pop();
+            }, 750)
+        },
+        updateGuessStates(slot, newStates, newLetters = this.wordSlots[slot].word) {
+            for (let i = 0; i < 5; i ++) {
+                window.setTimeout(() => {
+                    this.wordSlots[slot].states[i] = newStates[i]
+                    this.wordSlots[slot].word[i] = newLetters[i]
+                    statePriority = ['correct', 'position', 'wrong', 'unused']
+                    newKeyState = statePriority.indexOf(this.keyboardKeys[newLetters[i]].state) < statePriority.indexOf(newStates[i]) ? this.keyboardKeys[newLetters[i]].state : newStates[i]
+                    this.keyboardKeys[newLetters[i]].state = newKeyState
+                }, 250 * i)
+            }
+        },
+        makeGuess(guess) {
+            if (this.previousGuesses.includes(guess.toLocaleUpperCase())) {
+                this.notAWord();
+                return false;
+            }
+            sendRequest({
+                "action": "make_guess",
+                "guess": guess.toLocaleLowerCase()
+            }).then(response => 
+                response.json().then(data => {
+                    if (!data.real_word) {
+                        this.notAWord();
+                    } else {
+                        this.updateGuessStates(this.currentWord, data.answers);
+                        this.currentWord++;
+                    }
+                }))
         }
     },
     compilerOptions: {
@@ -398,6 +294,15 @@ const wordle = Vue.createApp({
 
 const vm = wordle.mount('#wordle');
 
+sendRequest({
+    'action': 'setup'
+}).then(response => 
+    response.json().then(data => {
+        for (let i = 0; i < data[0].length; i ++) {
+            vm.updateGuessStates(i, data[1][i], data[0][i].toLocaleUpperCase());
+            vm.currentWord++;
+        }
+    }))
 
 // set up keyboard
 for (let i = 0; i <= 18; i++) {
