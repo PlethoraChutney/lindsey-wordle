@@ -253,44 +253,6 @@ async function make_guess(guess = '') {
     })
 };
 
-// Keypress handling
-
-let working_guess = [];
-
-function read_key(keypress) {
-
-    if (word_guessed) {
-        return true;
-    }
-    let current_slot = (10 * current_guess) + working_guess.length;
-    if (keypress.toUpperCase() === 'BACKSPACE' || keypress.toUpperCase() === 'DEL') {
-        current_slot--;
-        working_guess.pop();
-        $('#position-' + current_slot).text('');
-    } else if (keypress.toUpperCase() === 'ENTER') {
-        if (working_guess.length === 5) {
-            make_guess(working_guess.join(''));
-        }
-    } else if (working_guess.length < 5) {
-        working_guess.push(keypress.toUpperCase());
-        $('#position-' + current_slot).text(working_guess[working_guess.length - 1]);
-    }
-};
-
-$(document).keydown(function(e) {
-    // prevent backspace navigation
-    if (e.keyCode == 8) {
-        e.preventDefault();
-        read_key('backspace');
-    } else if (e.keyCode == 13) {
-        read_key('enter');
-    } else if (working_guess.length < 5 && e.keyCode >= 65 && e.keyCode <= 90) {
-        read_key(String.fromCharCode(e.which));
-    } else if (e.keyCode === 27) {
-        $('#end-modal').addClass('hidden');
-    }
-});
-
 // Stolen from https://stackoverflow.com/questions/400212/how-do-i-copy-to-the-clipboard-in-javascript
 
 function fallbackClipboard(text) {
@@ -396,12 +358,34 @@ const wordle = Vue.createApp({
                 {id: 3, word: [], states: Array(5).fill('unused')},
                 {id: 4, word: [], states: Array(5).fill('unused')},
                 {id: 5, word: [], states: Array(5).fill('unused')}
-            ]
+            ],
+            'currentWord': 0,
+            'wordGuessed': false
         }
     },
     components: {
         KeyboardKey,
         WordSlot
+    },
+    methods: {
+        handleKeypress(keypress) {
+            if (this.word_guessed) {
+                return true;
+            }
+            
+            if (keypress.toUpperCase() === 'BACKSPACE' || keypress.toUpperCase() === 'DEL') {
+                this.wordSlots[this.currentWord].word.pop();
+            } else if (keypress.toUpperCase() === 'ENTER') {
+                if (this.wordSlots[this.currentWord].word.length === 5) {
+                    this.makeGuess();
+                }
+            } else if (this.wordSlots[this.currentWord].word.length < 5) {
+                this.wordSlots[this.currentWord].word.push(keypress.toUpperCase());
+            }
+        },
+        makeGuess() {
+            console.log('Making guess');
+        }
     },
     compilerOptions: {
         delimiters: ['[[', ']]']
@@ -444,3 +428,17 @@ vm.$data.keyboardKeys['Del'] = {
 
 // Not sure where this blank element comes from but this is easier than finding out
 delete vm.$data.keyboardKeys['']
+
+$(document).keydown(function(e) {
+    // prevent backspace navigation
+    if (e.keyCode == 8) {
+        e.preventDefault();
+        vm.handleKeypress('backspace');
+    } else if (e.keyCode == 13) {
+        vm.handleKeypress('enter');
+    } else if (e.keyCode >= 65 && e.keyCode <= 90) {
+        vm.handleKeypress(String.fromCharCode(e.which));
+    } else if (e.keyCode === 27) {
+        $('#end-modal').addClass('hidden');
+    }
+});
