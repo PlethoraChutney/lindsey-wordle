@@ -1,5 +1,4 @@
 const wordle_url = window.location.href;
-var word_guessed = false;
 
 // setup:
 //  - Get the prior guesses, then run them as a guess to "set the board"
@@ -322,7 +321,12 @@ $('#grid-actual').click(() => {
 
 const KeyboardKey = {
     props: ['keyLetter', 'usage'],
-    template: `<div class="keyboard-key" :class="usage">{{ keyLetter }}</div>`
+    template: `
+        <div
+            class="keyboard-key"
+            :class="usage"
+            @click="$emit('keyClicked')"
+        >{{ keyLetter }}</div>`
 }
 
 const LetterSlot = {

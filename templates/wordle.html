@@ -35,6 +35,7 @@
                     v-bind:key="letter.id"
                     v-bind:key-letter="letter.keyLetter"
                     v-bind:usage="letter.state"
+                    @key-clicked="handleKeypress(letter.keyLetter)"
                 ></keyboard-key>
             </div>
             <div>
@@ -43,6 +44,7 @@
                     v-bind:key="letter.id"
                     v-bind:key-letter="letter.keyLetter"
                     v-bind:usage="letter.state"
+                    @key-clicked="handleKeypress(letter.keyLetter)"
                 ></keyboard-key>
             </div>
             <div>
@@ -51,6 +53,7 @@
                     v-bind:key="letter.id"
                     v-bind:key-letter="letter.keyLetter"
                     v-bind:usage="letter.state"
+                    @key-clicked="handleKeypress(letter.keyLetter)"
                 ></keyboard-key>
             </div>
         </div>
