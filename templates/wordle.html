@@ -17,8 +17,8 @@
     <meta name="msapplication-TileColor" content="#da532c">
     <meta name="theme-color" content="#ffffff">
 </head>
-<body>
-    <div id="wordle">
+<body id="wordle-app" class="flex-col">
+    <div id="wordle" class="flex-col">
         <h1>Lindsey's Wordle</h1>
         <div id="guesses">
             <word-slot
@@ -29,6 +29,7 @@
                 :class="slot.slot_class"
             ></word-slot>
         </div>
+
         <div id="keyboard">
             <div>
                 <keyboard-key
@@ -58,19 +59,28 @@
                 ></keyboard-key>
             </div>
         </div>
-    </div>
-    <div id="end-modal" class="hidden">
-        <div id="modal-content">
-            <div id="modal-holder">
-                <div id="emoji-grid">Copy emoji grid</div>
-                <span id="close-modal">&times;</span>
+        
+        <div id="end-modal" class="" :class="{hidden: !showModal}" @click="showModal = false">
+            <div id="modal-content" class="flex-col" @click.stop>
+                <div id="modal-holder" class="flex-row">
+                    <div
+                        id="emoji-grid"
+                        @click.once="getEmojiGrid"
+                    >
+                        Copy emoji grid
+                    </div>
+                    <span id="close-modal" @click="showModal = false">&times;</span>
+                </div>
+                <emoji-grid :grid="emojiString"></emoji-grid>
+                <div id="leaderboard-graph">
+                </div>
+                <p v-if="wordGuessed">
+                    Nice work! You did it!
+                </p>
+                <p v-else>
+                    Sorry, better luck next time! Your word was [[answerWord]]
+                </p>
             </div>
-            <div id="grid-holder" class="hidden">
-                <div id="grid-actual"></div>
-            </div>
-            <div id="leaderboard-graph">
-            </div>
-            <p></p>
         </div>
     </div>
 </body>

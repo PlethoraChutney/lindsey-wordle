@@ -57,7 +57,7 @@ def make_emoji_grid(session):
         session['word_generation_time'],
         '%a, %b %d, %H:%M'
     )
-    emoji_grid = f'L-Wordle\n{formatted_date}\n{emoji_grid}'
+    emoji_grid = f'L-Wordle · {len(emoji_lists)}/6\n{formatted_date}\n{emoji_grid}'
 
     return emoji_grid
 
@@ -168,7 +168,7 @@ def index():
         # get emoji grid for sharing
         elif req_json['action'] == 'get_emoji_grid':
             return json.dumps(
-                make_emoji_grid(session)
+                {'emoji_string': make_emoji_grid(session)}
                 ), 200, {'ContentType': 'application/json'}
 
         elif req_json['action'] == 'get_leaderboard':

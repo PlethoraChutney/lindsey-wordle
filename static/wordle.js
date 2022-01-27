@@ -192,6 +192,15 @@ const WordSlot = {
     `
 }
 
+const EmojiGrid = {
+    props: ['grid'],
+    template: `
+    <div id="grid-holder" :class="{'hidden': grid === ''}">
+        <div id="grid-actual">{{ grid }}</div>
+    </div>
+    `
+}
+
 const wordle = Vue.createApp({
     data() {
         return {
@@ -204,21 +213,22 @@ const wordle = Vue.createApp({
                 {id: 4, word: [], states: Array(5).fill('unused'), slot_class: []},
                 {id: 5, word: [], states: Array(5).fill('unused'), slot_class: []}
             ],
-            'currentWord': 0
+            'currentWord': 0,
+            'answerWord': '',
+            'emojiString': '',
+            'showModal': false
         }
     },
     components: {
         KeyboardKey,
-        WordSlot
+        WordSlot,
+        EmojiGrid
     },
     computed: {
         wordGuessed() {
-            if (this.currentWord === 6) {
-                return true
-            }
-
             for (let i = 0; i <= 5; i++) {
-                if (this.wordSlots[i].states.every(v => v === 'correct')) {
+                console.log(this.wordSlots[i].states);
+                if (this.wordSlots[i].states.every(v => v.includes('correct'))) {
                     return true
                 }
             }
@@ -232,11 +242,25 @@ const wordle = Vue.createApp({
             }
 
             return guesses;
+        },
+        donePlaying() {
+            return this.wordGuessed || this.previousGuesses.length >= 6;
+        }
+    },
+    watch: {
+        donePlaying: function () {
+            if (this.wordGuessed) {
+                this.winnerWord();
+            } else {
+                window.setTimeout(() => {
+                    this.showModal = true;
+                }, 2000)
+            }
         }
     },
     methods: {
         handleKeypress(keypress) {
-            if (this.wordGuessed) {
+            if (this.donePlaying) {
                 return true;
             }
             
@@ -258,11 +282,15 @@ const wordle = Vue.createApp({
             }, 750)
         },
         winnerWord() {
+            this.answerWord = this.wordSlots[this.currentWord - 1].word.join('');
             for (let i = 0; i < 5; i ++) {
                 window.setTimeout(() => {
                     this.wordSlots[this.currentWord - 1].states[i] = this.wordSlots[this.currentWord - 1].states[i] + ' winner-word'
                 }, 125 * i);
             }
+            window.setTimeout(() => {
+                this.showModal = true;
+            }, 1250);
         },
         updateGuessStates(slot, newStates, newLetters = this.wordSlots[slot].word) {
             for (let i = 0; i < 5; i ++) {
@@ -290,8 +318,18 @@ const wordle = Vue.createApp({
                     } else {
                         this.updateGuessStates(this.currentWord, data.answers);
                         this.currentWord++;
+                        if (data.word) {
+                            this.answerWord = data.word
+                        }
                     }
                 }))
+        },
+        getEmojiGrid() {
+            sendRequest({
+                'action': 'get_emoji_grid'
+            }).then(response => response.json().then(data => {
+                this.emojiString = data.emoji_string;
+            }))
         }
     },
     compilerOptions: {
@@ -308,6 +346,9 @@ sendRequest({
         for (let i = 0; i < data[0].length; i ++) {
             vm.updateGuessStates(i, data[1][i], data[0][i].toLocaleUpperCase());
             vm.currentWord++;
+        }
+        if (data.length === 3) {
+            vm.answerWord = data[2].toLocaleUpperCase();
         }
     }))
 

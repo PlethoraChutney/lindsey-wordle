@@ -30,10 +30,20 @@ p {
     font-family: Outfit, sans-serif;
 }
 
-#wordle {
+.flex-col {
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
+    align-items: center;
+}
+
+.flex-row {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+
+#wordle {
     max-width: 860px;
     text-align: center;
     height: 100%;
@@ -97,8 +107,6 @@ div.letter {
     text-align: center;
     font-family: sans-serif;
     border-radius: 5px;
-    display: flex;
-    flex-direction: column;
     justify-content: center;
 }
 
@@ -230,9 +238,8 @@ div.winner-word {
 }
 
 #modal-holder {
-    display: flex;
-    flex-direction: row;
     justify-content: space-between;
+    width: 100%;
 }
 
 #grid-holder {
@@ -242,6 +249,7 @@ div.winner-word {
 }
 
 #grid-actual {
+    text-align: left;
     white-space: pre;
     background-color: #EEE;
     margin: 10px;
