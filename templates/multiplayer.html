@@ -53,7 +53,7 @@
                         </div>
                         <hr>
                     </div>
-                    <div id="submit">
+                    <div id="submit" v-if="canMakeGame">
                         <div
                         class="button"
                         :class="{valid: selected === 0 || isValidWord}"
@@ -62,10 +62,15 @@
                         [[submitButtonText]]
                         </div>
                     </div>
+                    <div v-else>
+                        <p>
+                            Can make game in [[countdownMinuteSecond]]
+                        </p>
                     </div>
                 </div>
                 <div v-if="showPostSetup">
-                    <p>Okay, you're good to go! Your game can be found
+                    <p>
+                        Okay, you're good to go! Your game can be found
                         <a :href="[[gameURL]]">here!</a>
                     </p>
                 </div>

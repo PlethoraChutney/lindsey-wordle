@@ -9,6 +9,7 @@ const MultiplayerApp = {
             ],
             selected: 0,
             hasGame: false,
+            newGameIn: 0,
             showPostSetup: false,
             gameURL: '',
             ownWord: '',
@@ -20,10 +21,18 @@ const MultiplayerApp = {
             return this.isValidWord ? '✔️' : '❌'
         },
         validWordHover() {
-            return 'Hover text'
+            return 'Hover text';
         },
         submitButtonText() {
-            return this.hasGame ? 'Overwrite old game' : 'Submit'
+            return this.hasGame ? 'Overwrite old game' : 'Submit';
+        },
+        canMakeGame() {
+            return this.newGameIn <= 0;
+        },
+        countdownMinuteSecond() {
+            minutes = Math.floor(this.newGameIn / 60);
+            seconds = (this.newGameIn % 60).toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false});
+            return `${minutes}:${seconds}`;
         }
     },
     watch: {
@@ -81,8 +90,10 @@ const MultiplayerApp = {
             }).then(response => 
                 response.json()
                 .then(data => {
-                    this.gameURL = data.url
-                    this.showPostSetup = true
+                    if (data.url) {
+                        this.gameURL = data.url;
+                        this.showPostSetup = true;
+                    }
                 })
             );
 

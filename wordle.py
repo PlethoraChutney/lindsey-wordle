@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, session, redirect
 import json
 import random
 import os
-import datetime
+from datetime import datetime
 import spellchecker
 import logging
 from uuid import uuid4
@@ -20,7 +20,7 @@ with open('words.json', 'r') as f:
 # have to use a list so that it is globally modifiable
 word_and_time = [
     random.choice(word_list),
-    datetime.datetime.now()
+    datetime.now()
 ]
 
 leaderboard_dict = {
@@ -57,8 +57,8 @@ def make_emoji_grid(guesses, word, puzzle_id):
                 'correct', '🟩'
                 ) for x in emoji_lists]
     emoji_grid = '\n'.join(emoji_lists)
-    if isinstance(puzzle_id, datetime.datetime):
-        puzzle_id = datetime.datetime.strftime(
+    if isinstance(puzzle_id, datetime):
+        puzzle_id = datetime.strftime(
             puzzle_id,
             '%a, %b %d, %H:%M'
         )
@@ -112,16 +112,16 @@ def make_guess(guess, session):
 def check_for_updates():
 
     # make new daily leaderboard
-    if datetime.datetime.today().day != word_and_time[1].day:
+    if datetime.today().day != word_and_time[1].day:
         for key in leaderboard_dict.keys():
             leaderboard_dict[key] = 0
 
     # detect if new word needed
-    time_since_word = datetime.datetime.now() - word_and_time[1]
+    time_since_word = datetime.now() - word_and_time[1]
     if time_since_word.total_seconds() > 30 * 60:
         word_and_time[0] = random.choice(word_list)
         session['prior_guesses'] = []
-        word_and_time[1] = datetime.datetime.now()
+        word_and_time[1] = datetime.now()
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -214,6 +214,10 @@ def multiplayer_setup():
 
             if has_game:
                 setup_data['url'] = f'/multiplayer/game?id={sess_id}&theme={use_theme}'
+                setup_data['game_created_time'] = datetime.strftime(
+                    multiplayer_words[sess_id].get('game_created_time'),
+                    '%a, %b %d, %H:%M'
+                )
 
             return json.dumps(setup_data), 200, {'ContentType': 'application/json'}
 
@@ -224,11 +228,19 @@ def multiplayer_setup():
             else:
                 word = random.choice(word_list)
 
+            if sess_id in multiplayer_words:
+                if (datetime.now() - multiplayer_words[sess_id]['game_created_time']).seconds/60 < 30:
+                    return json.dumps({
+                        'url': False,
+                        'reason': 'Game made too recently'
+                    }), 200, {'ContentType': 'application/json'}
+
             multiplayer_words[sess_id] = {
                 'word': word,
                 'custom': rj['custom_word'],
                 'guesses': [],
-                'answers': []
+                'answers': [],
+                'game_created_time': datetime.now()
             }
 
             game_url = f'/multiplayer/game?id={sess_id}&theme={use_theme}'
