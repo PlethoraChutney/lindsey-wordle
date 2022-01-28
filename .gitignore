@@ -3,3 +3,4 @@ venv/
 original-words.json
 words.json
 not-words.json
+static/vue.global.prod.js

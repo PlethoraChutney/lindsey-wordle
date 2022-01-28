@@ -305,6 +305,8 @@ sendRequest({
         if ('word' in data) {
             vm.answerWord = data['word'].toLocaleUpperCase();
         }
+        if ('player_id' in data) {vm.playerId = data.player_id;}
+        if ('custom' in data) {vm.customMpGame = data.custom;}
     }))
 
 // set up keyboard
