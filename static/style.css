@@ -126,6 +126,10 @@ div.letter {
         padding: 2vw;
         margin: 0.5vw;
     }
+
+    div.letter {
+        width: 15vw;
+    }
 }
 
 #keyboard .wrong {
