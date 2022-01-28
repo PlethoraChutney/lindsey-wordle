@@ -81,29 +81,6 @@ async function getLeaderboard() {
     })
 }
 
-// opening and closing of ending modal window
-
-function end_modal(message) {
-    $('#modal-content p')
-        .text(message);
-    $('#end-modal').toggleClass('hidden');
-    getLeaderboard();
-};
-
-$('#close-modal').click(() => {
-    $('#end-modal').toggleClass('hidden');
-});
-
-$('#end-modal').click(function() {
-    $('#end-modal').toggleClass('hidden');
-});
-
-$('#modal-content').click(function(e) {
-    e.stopPropagation();
-})
-
-$('#emoji-grid').click(getEmojiGrid);
-
 // Stolen from https://stackoverflow.com/questions/400212/how-do-i-copy-to-the-clipboard-in-javascript
 
 function fallbackClipboard(text) {
@@ -140,25 +117,6 @@ function copyTextToClipboard(text) {
       console.error('Async: Could not copy text: ', err);
     });
 }
-
-// make emoji grid
-async function getEmojiGrid() {
-    const response = await sendRequest({'action': 'get_emoji_grid'});
-
-    response.json().then((value) => {
-        document.getElementById('grid-actual')
-            .innerHTML = value.replace(/\n/gi, '<br/>');
-        $('#grid-holder').removeClass('hidden');
-        copyTextToClipboard(value);
-    })
-    
-};
-
-$('#grid-actual').click(() => {
-    window.getSelection().selectAllChildren(
-        document.getElementById('grid-actual')
-    );
-});
 
 const KeyboardKey = {
     props: ['keyLetter', 'usage'],
@@ -249,13 +207,75 @@ const wordle = Vue.createApp({
     },
     watch: {
         donePlaying: function () {
-            if (this.wordGuessed) {
-                this.winnerWord();
-            } else {
-                window.setTimeout(() => {
-                    this.showModal = true;
-                }, 2000)
-            }
+            // play winner animation and show the modal window
+            window.setTimeout(() => {
+                if (this.wordGuessed) {
+                    this.winnerWord();
+                } else {
+                    window.setTimeout(() => {
+                        this.showModal = true;
+                    }, 1250)
+                }
+            }, 750)
+
+            // get the plotly plot while we wait for the modal window to launch
+            sendRequest({'action': 'get_leaderboard'})
+                .then(request => request.json().then(data => {
+                    leaderDiv = document.getElementById('leaderboard-graph');
+
+                    data = [{
+                        x: Object.keys(data),
+                        y: Object.values(data),
+                        type: 'bar',
+                        marker: {
+                            color: '#97B3F0',
+                            line: {
+                                width: 1
+                            }
+                        }
+                    }];
+
+                    var urlParams = new URLSearchParams(window.location.search);
+                    let manual_dark_mode = urlParams.toString().includes('theme=dark');
+                    let dark_scheme = window.matchMedia('(prefers-color-scheme: dark)').matches || manual_dark_mode;
+
+                    layout = {
+                        margin: {t:50},
+                        title: {
+                            text: 'Today\'s Wordle Scores',
+                            font: {}
+                        },
+                        yaxis: {
+                            dtick: 2,
+                            title: {
+                                text: 'Number of wordlers'
+                            }
+                        },
+                        xaxis: {
+                            title: {
+                                text: 'Guesses to right answer'
+                            }
+                        },
+                        height: 300
+                    };
+
+                    if (dark_scheme) {
+                        layout['plot_bgcolor'] = '#151821';
+                        layout['paper_bgcolor'] = '#151821';
+                        layout['yaxis']['color'] = '#AAA';
+                        layout['xaxis']['color'] = '#AAA';
+                        layout['title']['font']['color'] = '#AAA';
+
+                        data[0]['marker']['color'] = '#566FA3';
+                    }
+
+                    config = {
+                        displayModeBar: false,
+                        responsive: true
+                    };
+
+                    Plotly.newPlot(leaderDiv, data, layout, config)
+                }))
         }
     },
     methods: {
