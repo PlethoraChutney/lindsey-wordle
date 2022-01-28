@@ -150,4 +150,7 @@ async function optionsSetup(url = wordleUrl) {
 optionsSetup().then((value) => {
     vm.$data.hasGame = value.has_game;
     vm.$data.gameURL = value.url;
+    if (value.has_game) {
+        vm.newGameIn = value.time_remaining;
+    }
 })

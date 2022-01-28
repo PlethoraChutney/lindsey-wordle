@@ -214,10 +214,8 @@ def multiplayer_setup():
 
             if has_game:
                 setup_data['url'] = f'/multiplayer/game?id={sess_id}&theme={use_theme}'
-                setup_data['game_created_time'] = datetime.strftime(
-                    multiplayer_words[sess_id].get('game_created_time'),
-                    '%a, %b %d, %H:%M'
-                )
+                setup_data['time_remaining'] =\
+                    30*60 - (datetime.now() - multiplayer_words[sess_id]['game_created_time']).seconds
 
             return json.dumps(setup_data), 200, {'ContentType': 'application/json'}
 
