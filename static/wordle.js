@@ -106,7 +106,10 @@ const wordle = Vue.createApp({
             return guesses;
         },
         donePlaying() {
-            return this.wordGuessed || this.previousGuesses.length >= 6;
+            if (this.currentWord == 0) {
+                return false;
+            }
+            return this.wordSlots[this.currentWord - 1].states.every(v => !v.includes('unused'));
         }
     },
     watch: {
