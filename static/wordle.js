@@ -109,7 +109,7 @@ const wordle = Vue.createApp({
             if (this.currentWord == 0) {
                 return false;
             }
-            return this.wordSlots[this.currentWord - 1].states.every(v => !v.includes('unused'));
+            return this.wordGuessed || (this.currentWord == 6 && this.wordSlots[this.currentWord - 1].states.every(v => !v.includes('unused')));
         }
     },
     watch: {
