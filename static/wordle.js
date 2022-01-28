@@ -77,7 +77,9 @@ const wordle = Vue.createApp({
             'currentWord': 0,
             'answerWord': '',
             'emojiString': '',
-            'showModal': false
+            'showModal': false,
+            'playerId': '',
+            'customMpGame': false
         }
     },
     components: {
@@ -121,6 +123,8 @@ const wordle = Vue.createApp({
             }, 750)
 
             // get the plotly plot while we wait for the modal window to launch
+            // as long as we're not in a multiplayer game
+            if (window.location.href.indexOf('multiplayer') == -1) {
             sendRequest({'action': 'get_leaderboard'})
                 .then(request => request.json().then(data => {
                     leaderDiv = document.getElementById('leaderboard-graph');
@@ -177,12 +181,15 @@ const wordle = Vue.createApp({
                     };
 
                     Plotly.newPlot(leaderDiv, data, layout, config)
-                }))
+                }))}
         }
     },
     methods: {
         handleKeypress(keypress) {
-            if (this.donePlaying) {
+            var urlParams = new URLSearchParams(window.location.search);
+            let custom_game_creator = urlParams.toString().includes(this.playerId);
+
+            if (this.donePlaying || (this.customMpGame && custom_game_creator)) {
                 return true;
             }
             
@@ -241,7 +248,7 @@ const wordle = Vue.createApp({
                         this.updateGuessStates(this.currentWord, data.answers);
                         this.currentWord++;
                         if (data.word) {
-                            this.answerWord = data.word
+                            this.answerWord = data.word.toLocaleUpperCase();
                         }
                     }
                 }))
@@ -284,12 +291,12 @@ sendRequest({
     'action': 'setup'
 }).then(response => 
     response.json().then(data => {
-        for (let i = 0; i < data[0].length; i ++) {
-            vm.updateGuessStates(i, data[1][i], data[0][i].toLocaleUpperCase());
+        for (let i = 0; i < data['guesses'].length; i ++) {
+            vm.updateGuessStates(i, data['answers'][i], data['guesses'][i].toLocaleUpperCase());
             vm.currentWord++;
         }
-        if (data.length === 3) {
-            vm.answerWord = data[2].toLocaleUpperCase();
+        if ('word' in data) {
+            vm.answerWord = data['word'].toLocaleUpperCase();
         }
     }))
 

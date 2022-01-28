@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wordle!</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename = 'style.css') }}">
+    {% if night_theme %}
+    <link rel="stylesheet" href="{{ url_for('static', filename = 'night_theme.css') }}">
+    {% endif %}
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename = '/apple-touch-icon.png') }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename = '/favicon-32x32.png') }}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename = '/favicon-16x16.png') }}">
+    <link rel="manifest" href="{{ url_for('static', filename = '/site.webmanifest') }}">
+    <link rel="mask-icon" href="{{ url_for('static', filename = '/safari-pinned-tab.svg') }}" color="#5bbad5">
+    <meta name="msapplication-TileColor" content="#da532c">
+    <meta name="theme-color" content="#ffffff">
+</head>
+<body id="wordle-app" class="flex-col">
+    <div id="wordle" class="flex-col">
+        <h1>Lindsey's Wordle</h1>
+        <h2>Multiplayer</h2>
+        <div id="guesses">
+            <word-slot
+                v-for="slot in wordSlots"
+                :key="slot.id"
+                :letters="slot.word"
+                :states="slot.states"
+                :class="slot.slot_class"
+            ></word-slot>
+        </div>
+
+        <div id="keyboard">
+            <div>
+                <keyboard-key
+                    v-for="letter of Object.values(keyboardKeys).slice(0,10)"
+                    v-bind:key="letter.id"
+                    v-bind:key-letter="letter.keyLetter"
+                    v-bind:usage="letter.state"
+                    @key-clicked="handleKeypress(letter.keyLetter)"
+                ></keyboard-key>
+            </div>
+            <div>
+                <keyboard-key
+                    v-for="letter of Object.values(keyboardKeys).slice(10,19)"
+                    v-bind:key="letter.id"
+                    v-bind:key-letter="letter.keyLetter"
+                    v-bind:usage="letter.state"
+                    @key-clicked="handleKeypress(letter.keyLetter)"
+                ></keyboard-key>
+            </div>
+            <div>
+                <keyboard-key
+                    v-for="letter of Object.values(keyboardKeys).slice(19, 28)"
+                    v-bind:key="letter.id"
+                    v-bind:key-letter="letter.keyLetter"
+                    v-bind:usage="letter.state"
+                    @key-clicked="handleKeypress(letter.keyLetter)"
+                ></keyboard-key>
+            </div>
+        </div>
+        
+        <div id="end-modal" class="" :class="{hidden: !showModal}" @click="showModal = false">
+            <div id="modal-content" class="flex-col" @click.stop>
+                <div id="modal-holder" class="flex-row">
+                    <div
+                        id="emoji-grid"
+                        @click.once="getEmojiGrid"
+                        @click="emojiToClipboard"
+                    >
+                        [[ emojiString === '' ? 'Show emoji grid' : 'Grid copied to keyboard']]
+                    </div>
+                    <span id="close-modal" @click="showModal = false">&times;</span>
+                </div>
+                <emoji-grid :grid="emojiString"></emoji-grid>
+                <div id="leaderboard-graph">
+                </div>
+                <p v-if="wordGuessed">
+                    Nice work! You did it!
+                </p>
+                <p v-else>
+                    Sorry, better luck next time! Your word was [[answerWord]]
+                </p>
+            </div>
+        </div>
+    </div>
+</body>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+<script src="https://cdn.plot.ly/plotly-2.8.3.min.js"></script>
+<script src="https://unpkg.com/vue@v3.2.27"></script>
+<script src="{{ url_for('static', filename = 'wordle.js') }}"></script>
+</html>

@@ -162,9 +162,12 @@ def index():
 
         # get prior guesses
         elif req_json['action'] == 'setup':
-            setup_lists = [session['prior_guesses'], session['prior_answers']]
+            setup_lists = {
+                'guesses': session['prior_guesses'],
+                'answers': session['prior_answers']
+            }
             if len(session['prior_guesses']) == 6:
-                setup_lists.append(session['word'])
+                setup_lists['word'] = session['word']
             return json.dumps(
                 setup_lists
             ), 200, {'ContentType': 'application/json'}
@@ -227,6 +230,33 @@ def multiplayer_setup():
                 'url': game_url
             }), 200, {'ContentType': 'application/json'}
 
+
+def multiplayer_make_guess(guess, game_id):
+    if not check_real_word(guess):
+        return {'real_word': False}
+
+    result = check_letter(guess, multiplayer_words[game_id]['word'])
+    if guess not in multiplayer_words[game_id]['guesses']\
+    and len(multiplayer_words[game_id]['guesses']) < 6:
+        temp = multiplayer_words[game_id]['guesses']
+        temp.append(guess)
+        multiplayer_words[game_id]['guesses'] = temp
+
+        temp = multiplayer_words[game_id]['answers']
+        temp.append(result)
+        multiplayer_words[game_id]['answers'] = temp
+
+    answer_returns = {
+        'real_word': True,
+        'answers': result
+    }
+    if len(multiplayer_words[game_id]['guesses']) == 6:
+        answer_returns['word'] = multiplayer_words[game_id]['word']
+    else:
+        answer_returns['word'] = False
+
+    return answer_returns
+
                 
 @app.route('/multiplayer/game', methods = ['GET', 'POST'])
 def multiplayer_game():
@@ -234,6 +264,54 @@ def multiplayer_game():
     if game_id is None:
         return redirect('/multiplayer')
 
-    game_info = multiplayer_words[game_id]
+    game_info = multiplayer_words.get(game_id)
+    if game_info is None:
+        return redirect('/multiplayer')
 
-    return json.dumps(game_info), 200, {'ContentType': 'application/json'}
+
+    if request.method == 'GET':
+        use_dark_theme = request.args.get('theme') == 'dark'
+        app.logger.debug(game_info)
+
+        if 'multiplayer_id' not in session:
+            session['multiplayer_id'] = uuid4().hex
+
+        return render_template('multiplayer_game.html', night_theme = use_dark_theme)
+
+    elif request.method == 'POST':
+        rj = request.get_json()
+
+        if rj['action'] == 'setup':
+            setup_lists = {
+                'guesses': multiplayer_words[game_id]['guesses'],
+                'answers': multiplayer_words[game_id]['answers'],
+                'player_id': session['multiplayer_id'],
+                'custom': multiplayer_words[game_id]['custom']
+            }
+            if len(multiplayer_words[game_id]['guesses']) == 6:
+                setup_lists['word'] = multiplayer_words[game_id]['word']
+
+            return json.dumps(
+                setup_lists
+            ), 200, {'ContentType': 'application/json'}
+
+        # make a guess
+        if rj['action'] == 'make_guess':
+            return json.dumps(
+                multiplayer_make_guess(rj['guess'].lower(), game_id)
+                ), 200, {'ContentType': 'application/json'}
+
+        # just check a word
+        elif rj['action'] == 'check_word':
+            return json.dumps(
+                {'is_word': check_real_word(rj['word'])}
+            ), 200, {'ContentType': 'application/json'}
+
+        # get emoji grid for sharing
+        elif rj['action'] == 'get_emoji_grid':
+            return json.dumps(
+                {'emoji_string': make_emoji_grid(session)}
+                ), 200, {'ContentType': 'application/json'}
+
+        elif rj['action'] == 'get_leaderboard':
+            return json.dumps(leaderboard_dict), 200, {'ContentType': 'application/json'}
