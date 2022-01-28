@@ -129,6 +129,13 @@ const wordle = Vue.createApp({
                 .then(request => request.json().then(data => {
                     leaderDiv = document.getElementById('leaderboard-graph');
 
+                    let max_y = Math.max(...Object.values(data));
+                    if (max_y <= 8) {
+                        let breaks = 1
+                    } else {
+                        let breaks = 2;
+                    }
+
                     data = [{
                         x: Object.keys(data),
                         y: Object.values(data),
@@ -152,7 +159,7 @@ const wordle = Vue.createApp({
                             font: {}
                         },
                         yaxis: {
-                            dtick: 2,
+                            dtick: breaks,
                             title: {
                                 text: 'Number of wordlers'
                             }
