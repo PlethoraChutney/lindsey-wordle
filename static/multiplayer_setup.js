@@ -42,6 +42,13 @@ const MultiplayerApp = {
             } else {
                 this.checkRealWord(newWord);
             }
+        },
+        newGameIn() {
+            if (this.newGameIn > 0) {
+                window.setTimeout(() => {
+                    this.newGameIn--;
+                }, 1000);
+            }
         }
     },
     methods: {
