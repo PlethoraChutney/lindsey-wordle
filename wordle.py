@@ -42,8 +42,8 @@ def check_real_word(word):
     return len(checker.unknown([word])) == 0
 
 
-def make_emoji_grid(session):
-    emoji_lists = [check_letter(guess, session['word']) for guess in session['prior_guesses']]
+def make_emoji_grid(guesses, word, puzzle_id):
+    emoji_lists = [check_letter(guess, word) for guess in guesses]
     if all([x == 'correct' for x in emoji_lists[-1]]):
         fraction = f' · {len(emoji_lists)}/6'
     else:
@@ -57,11 +57,14 @@ def make_emoji_grid(session):
                 'correct', '🟩'
                 ) for x in emoji_lists]
     emoji_grid = '\n'.join(emoji_lists)
-    formatted_date = datetime.datetime.strftime(
-        session['word_generation_time'],
-        '%a, %b %d, %H:%M'
-    )
-    emoji_grid = f'L-Wordle{fraction}\n{formatted_date}\n{emoji_grid}'
+    if isinstance(puzzle_id, datetime.datetime):
+        puzzle_id = datetime.datetime.strftime(
+            puzzle_id,
+            '%a, %b %d, %H:%M'
+        )
+    else:
+        puzzle_id = puzzle_id
+    emoji_grid = f'L-Wordle{fraction}\n{puzzle_id}\n{emoji_grid}'
 
     return emoji_grid
 
@@ -175,7 +178,11 @@ def index():
         # get emoji grid for sharing
         elif req_json['action'] == 'get_emoji_grid':
             return json.dumps(
-                {'emoji_string': make_emoji_grid(session)}
+                {'emoji_string': make_emoji_grid(
+                    session['prior_guesses'],
+                    session['word'],
+                    session['word_generation_time']
+                )}
                 ), 200, {'ContentType': 'application/json'}
 
         elif req_json['action'] == 'get_leaderboard':
@@ -310,7 +317,11 @@ def multiplayer_game():
         # get emoji grid for sharing
         elif rj['action'] == 'get_emoji_grid':
             return json.dumps(
-                {'emoji_string': make_emoji_grid(session)}
+                {'emoji_string': make_emoji_grid(
+                    multiplayer_words[game_id]['guesses'],
+                    multiplayer_words[game_id]['word'],
+                    game_id[-7:]
+                    )}
                 ), 200, {'ContentType': 'application/json'}
 
         elif rj['action'] == 'get_leaderboard':
