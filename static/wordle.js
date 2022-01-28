@@ -1,9 +1,5 @@
 const wordle_url = window.location.href;
 
-// setup:
-//  - Get the prior guesses, then run them as a guess to "set the board"
-//  - Also create the current_guess variable and set it to the proper number
-
 function sendRequest(body) {
     return fetch(wordle_url, {
         method: 'POST',
@@ -17,105 +13,6 @@ function sendRequest(body) {
         referrerPolicy: 'no-referrer',
         body: JSON.stringify(body)
     })
-}
-
-// get leaderboard, make graph
-async function getLeaderboard() {
-    const response = await sendRequest({'action': 'get_leaderboard'});
-
-    response.json().then((value) => {
-        leaderDiv = document.getElementById('leaderboard-graph');
-
-        data = [{
-            x: Object.keys(value),
-            y: Object.values(value),
-            type: 'bar',
-            marker: {
-                color: '#97B3F0',
-                line: {
-                    width: 1
-                }
-            }
-        }];
-
-        var urlParams = new URLSearchParams(window.location.search);
-        let manual_dark_mode = urlParams.toString().includes('theme=dark');
-        let dark_scheme = window.matchMedia('(prefers-color-scheme: dark)').matches || manual_dark_mode;
-
-        layout = {
-            margin: {t:50},
-            title: {
-                text: 'Today\'s Wordle Scores',
-                font: {}
-            },
-            yaxis: {
-                dtick: 2,
-                title: {
-                    text: 'Number of other wordlers'
-                }
-            },
-            xaxis: {
-                title: {
-                    text: 'Guesses to right answer'
-                }
-            },
-            height: 300
-        };
-
-        if (dark_scheme) {
-            layout['plot_bgcolor'] = '#151821';
-            layout['paper_bgcolor'] = '#151821';
-            layout['yaxis']['color'] = '#AAA';
-            layout['xaxis']['color'] = '#AAA';
-            layout['title']['font']['color'] = '#AAA';
-
-            data[0]['marker']['color'] = '#566FA3';
-        }
-
-        config = {
-            displayModeBar: false,
-            responsive: true
-        };
-
-        Plotly.newPlot(leaderDiv, data, layout, config)
-    })
-}
-
-// Stolen from https://stackoverflow.com/questions/400212/how-do-i-copy-to-the-clipboard-in-javascript
-
-function fallbackClipboard(text) {
-    var textArea = document.createElement("textarea");
-    textArea.value = text;
-    
-    // Avoid scrolling to bottom
-    textArea.style.top = "0";
-    textArea.style.left = "0";
-    textArea.style.position = "fixed";
-  
-    document.body.appendChild(textArea);
-    textArea.focus();
-    textArea.select();
-  
-    try {
-      var successful = document.execCommand('copy');
-      var msg = successful ? 'successful' : 'unsuccessful';
-      console.log('Fallback: Copying text command was ' + msg);
-    } catch (err) {
-      console.error('Fallback: Oops, unable to copy', err);
-    }
-  
-    document.body.removeChild(textArea);
-  }
-function copyTextToClipboard(text) {
-    if (!navigator.clipboard) {
-      fallbackCopyTextToClipboard(text);
-      return;
-    }
-    navigator.clipboard.writeText(text).then(function() {
-      console.log('Async: Copying to clipboard was successful!');
-    }, function(err) {
-      console.error('Async: Could not copy text: ', err);
-    });
 }
 
 const KeyboardKey = {
@@ -154,9 +51,15 @@ const EmojiGrid = {
     props: ['grid'],
     template: `
     <div id="grid-holder" :class="{'hidden': grid === ''}">
-        <div id="grid-actual">{{ grid }}</div>
+        <div id="grid-actual" @click="selectAll">{{ grid }}</div>
     </div>
-    `
+    `,
+    methods: {
+        selectAll() {
+            var emojiGrid = document.getElementById('grid-actual');
+            window.getSelection().selectAllChildren(emojiGrid);
+        }
+    }
 }
 
 const wordle = Vue.createApp({
@@ -185,7 +88,6 @@ const wordle = Vue.createApp({
     computed: {
         wordGuessed() {
             for (let i = 0; i <= 5; i++) {
-                console.log(this.wordSlots[i].states);
                 if (this.wordSlots[i].states.every(v => v.includes('correct'))) {
                     return true
                 }
@@ -350,6 +252,25 @@ const wordle = Vue.createApp({
             }).then(response => response.json().then(data => {
                 this.emojiString = data.emoji_string;
             }))
+
+            window.setTimeout(this.emojiToClipboard, 250);
+        },
+        emojiToClipboard() {
+            var emojiGrid = document.getElementById('grid-actual');
+
+            if (!navigator.clipboard) {
+                emojiGrid.focus();
+                emojiGrid.select();
+                window.getSelection().removeAllRanges();
+            
+                try {
+                var successful = document.execCommand('copy');
+                } catch (err) {
+                console.error('Fallback: Oops, unable to copy', err);
+                }
+            } else {
+            navigator.clipboard.writeText(emojiGrid.textContent);
+            }
         }
     },
     compilerOptions: {

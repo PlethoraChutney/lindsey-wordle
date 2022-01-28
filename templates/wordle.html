@@ -66,8 +66,9 @@
                     <div
                         id="emoji-grid"
                         @click.once="getEmojiGrid"
+                        @click="emojiToClipboard"
                     >
-                        Copy emoji grid
+                        [[ emojiString === '' ? 'Show emoji grid' : 'Grid copied to keyboard']]
                     </div>
                     <span id="close-modal" @click="showModal = false">&times;</span>
                 </div>

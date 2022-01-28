@@ -44,6 +44,10 @@ def check_real_word(word):
 
 def make_emoji_grid(session):
     emoji_lists = [check_letter(guess, session['word']) for guess in session['prior_guesses']]
+    if all([x == 'correct' for x in emoji_lists[-1]]):
+        fraction = f' · {len(emoji_lists)}/6'
+    else:
+        fraction = ''
     emoji_lists = [' '.join(x) for x in emoji_lists]
     emoji_lists = [x.replace(
         'wrong', '🟥'
@@ -57,7 +61,7 @@ def make_emoji_grid(session):
         session['word_generation_time'],
         '%a, %b %d, %H:%M'
     )
-    emoji_grid = f'L-Wordle · {len(emoji_lists)}/6\n{formatted_date}\n{emoji_grid}'
+    emoji_grid = f'L-Wordle{fraction}\n{formatted_date}\n{emoji_grid}'
 
     return emoji_grid
 
