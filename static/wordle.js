@@ -131,9 +131,9 @@ const wordle = Vue.createApp({
 
                     let max_y = Math.max(...Object.values(data));
                     if (max_y <= 8) {
-                        let breaks = 1
+                        var breaks = 1
                     } else {
-                        let breaks = 2;
+                        var breaks = 2;
                     }
 
                     data = [{
