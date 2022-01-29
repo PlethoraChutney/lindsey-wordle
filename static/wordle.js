@@ -155,6 +155,13 @@ const wordle = Vue.createApp({
                     let manual_dark_mode = urlParams.toString().includes('theme=dark');
                     let dark_scheme = window.matchMedia('(prefers-color-scheme: dark)').matches || manual_dark_mode;
 
+                    let plot_width = screen.width;
+                    if (plot_width > 600) {
+                        plot_width = plot_width/3;
+                    } else {
+                        plot_width = plot_width * .8;
+                    }
+
                     layout = {
                         margin: {t:50},
                         title: {
@@ -172,7 +179,9 @@ const wordle = Vue.createApp({
                                 text: 'Guesses to right answer'
                             }
                         },
-                        height: 300
+                        height: 300,
+                        width: plot_width,
+                        autosize: true
                     };
 
                     if (dark_scheme) {
