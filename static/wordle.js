@@ -292,9 +292,14 @@ const wordle = Vue.createApp({
     },
     compilerOptions: {
         delimiters: ['[[', ']]']
+    },
+    beforeCreate() {
+        $('#end-modal').removeClass('hidden')
     }
 });
 
+
+$('#end-modal').removeClass('hidden');
 const vm = wordle.mount('#wordle');
 
 sendRequest({
