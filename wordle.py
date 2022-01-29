@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request, session, redirect
+from flask_socketio import SocketIO
 import json
 import random
 import os
@@ -9,10 +10,12 @@ from uuid import uuid4
 
 app = Flask(__name__)
 try:
-    app.secret_key = os.environ['SESSION_KEY']
+    app.secret_key = os.environ['SECRET_KEY']
 except KeyError:
     logging.warning('$SECRET_KEY not in environment.')
     app.secret_key = 'BAD_SECRET_KEY_FOR_DEVELOPMENT'
+
+socketio = SocketIO(app)
 
 with open('words.json', 'r') as f:
     word_list = json.load(f)
@@ -336,3 +339,6 @@ def multiplayer_game():
 
         elif rj['action'] == 'get_leaderboard':
             return json.dumps(leaderboard_dict), 200, {'ContentType': 'application/json'}
+
+if __name__ == '__main__':
+    socketio.run(app)
