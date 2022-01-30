@@ -20,7 +20,7 @@
 <body id="wordle-app" class="flex-col">
     <div id="wordle" class="flex-col">
         <h1>Lindsey's Wordle</h1>
-        <h2>Multiplayer</h2>
+        <h2><a href="/multiplayer">Multiplayer</a></h2>
         <div id="guesses">
             <word-slot
                 v-for="slot in wordSlots"
@@ -61,7 +61,7 @@
             </div>
         </div>
         
-        <div id="end-modal" class="" :class="{hidden: !showModal}" @click="showModal = false">
+        <div id="end-modal" class="hidden" :class="{hidden: !showModal}" @click="showModal = false">
             <div id="modal-content" class="flex-col" @click.stop>
                 <div id="modal-holder" class="flex-row">
                     <div
