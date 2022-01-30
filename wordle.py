@@ -1,6 +1,5 @@
 from flask import Flask, render_template, request, session, redirect
-from flask_socketio import SocketIO
-import eventlet
+from flask_socketio import SocketIO, emit, send, join_room, leave_room
 import json
 import random
 import os
@@ -340,6 +339,28 @@ def multiplayer_game():
 
         elif rj['action'] == 'get_leaderboard':
             return json.dumps(leaderboard_dict), 200, {'ContentType': 'application/json'}
+
+players = {}
+
+@socketio.on('connect')
+def test_connect():
+    players[request.sid] = {'rooms': []}
+    emit('write to log', {'data': 'Connected to Wordle server'})
+
+@socketio.on('joinRoom')
+def on_join(room):
+    print(f'Somebody joined {room}!')
+    players[request.sid]['rooms'].append(room)
+    print(players)
+    join_room(room)
+    emit('write to log', {'data': f'A new user joined {room}'}, to = room)
+
+@socketio.on('disconnect')
+def disconnect():
+    print('Client disconnected')
+    for room in players[request.sid]['rooms']:
+        emit('write to log', {'data': 'Player disconnected from ' + room}, to = room)
+    del players[request.sid]
 
 if __name__ == '__main__':
     socketio.run(app)
