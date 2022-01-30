@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request, session, redirect
+from flask_socketio import SocketIO, emit, send, join_room, leave_room
 import json
 import random
 import os
@@ -9,10 +10,12 @@ from uuid import uuid4
 
 app = Flask(__name__)
 try:
-    app.secret_key = os.environ['SESSION_KEY']
+    app.secret_key = os.environ['SECRET_KEY']
 except KeyError:
     logging.warning('$SECRET_KEY not in environment.')
     app.secret_key = 'BAD_SECRET_KEY_FOR_DEVELOPMENT'
+
+socketio = SocketIO(app)
 
 with open('words.json', 'r') as f:
     word_list = json.load(f)
@@ -222,7 +225,7 @@ def multiplayer_setup():
         elif rj['action'] == 'make_new_game':
             if rj['custom_word']:
                 assert check_real_word(rj['word'])
-                word = rj['word']
+                word = rj['word'].lower()
             else:
                 word = random.choice(word_list)
 
@@ -237,6 +240,7 @@ def multiplayer_setup():
                 'word': word,
                 'custom': rj['custom_word'],
                 'guesses': [],
+                'loose_letters': [],
                 'answers': [],
                 'game_created_time': datetime.now()
             }
@@ -301,6 +305,7 @@ def multiplayer_game():
         if rj['action'] == 'setup':
             setup_lists = {
                 'guesses': multiplayer_words[game_id]['guesses'],
+                'letters': [x.upper() for x in multiplayer_words[game_id]['loose_letters']],
                 'answers': multiplayer_words[game_id]['answers'],
                 'player_id': session['multiplayer_id'],
                 'custom': multiplayer_words[game_id]['custom']
@@ -336,3 +341,47 @@ def multiplayer_game():
 
         elif rj['action'] == 'get_leaderboard':
             return json.dumps(leaderboard_dict), 200, {'ContentType': 'application/json'}
+
+players = {}
+
+@socketio.on('connect')
+def test_connect():
+    players[request.sid] = {'rooms': [], 'wordle_id': session['multiplayer_id']}
+    emit('write to log', {'data': 'Connected to Wordle server'})
+
+@socketio.on('joinRoom')
+def on_join(room):
+    players[request.sid]['rooms'].append(room)
+    join_room(room)
+    if app.debug:
+        emit('write to log', {'data': f'A new user joined {room}'}, to = room)
+
+@socketio.on('disconnect')
+def disconnect():
+    if app.debug:
+        for room in players[request.sid]['rooms']:
+            emit('write to log', {'data': 'Player disconnected from ' + room}, to = room)
+    del players[request.sid]
+
+@socketio.on('keypress')
+def handle_keypress(json):
+    print(json)
+    if json['key'].lower() not in ['enter', 'del', 'backspace']:
+        if len(multiplayer_words[json['room']]['loose_letters']) < 5:
+            multiplayer_words[json['room']]['loose_letters'].append(json['key'].lower())
+            print(multiplayer_words[json['room']])
+
+    elif json['key'].lower() == 'enter':
+        if len(multiplayer_words[json['room']]['loose_letters']) == 5:
+            multiplayer_words[json['room']]['loose_letters'] = []
+
+    elif json['key'].lower() in ['del', 'backspace']:
+        multiplayer_words[json['room']]['loose_letters'].pop()
+
+
+    emit('server keypress', {
+        'key': json['key'], 'sent_by': players[request.sid]['wordle_id']
+        }, to = json['room']);
+
+if __name__ == '__main__':
+    socketio.run(app)

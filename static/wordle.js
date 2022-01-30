@@ -79,7 +79,8 @@ const wordle = Vue.createApp({
             'emojiString': '',
             'showModal': false,
             'playerId': '',
-            'customMpGame': false
+            'customMpGame': false,
+            'isMpGame': false
         }
     },
     components: {
@@ -204,12 +205,16 @@ const wordle = Vue.createApp({
         }
     },
     methods: {
-        handleKeypress(keypress) {
+        handleKeypress(keypress, sendToServer = true) {
             var urlParams = new URLSearchParams(window.location.search);
             let custom_game_creator = urlParams.toString().includes(this.playerId);
 
             if (this.donePlaying || (this.customMpGame && custom_game_creator)) {
                 return true;
+            }
+
+            if (this.isMpGame && sendToServer) {
+                sendServerKeypress(keypress);
             }
             
             if (keypress.toUpperCase() === 'BACKSPACE' || keypress.toUpperCase() === 'DEL') {
@@ -319,11 +324,17 @@ sendRequest({
             vm.updateGuessStates(i, data['answers'][i], data['guesses'][i].toLocaleUpperCase());
             vm.currentWord++;
         }
+
+        vm.wordSlots[vm.currentWord].word = data.letters;
+
         if ('word' in data) {
             vm.answerWord = data['word'].toLocaleUpperCase();
         }
         if ('player_id' in data) {vm.playerId = data.player_id;}
-        if ('custom' in data) {vm.customMpGame = data.custom;}
+        if ('custom' in data) {
+            vm.isMpGame = true;
+            vm.customMpGame = data.custom;
+        }
     }))
 
 // set up keyboard
@@ -373,3 +384,29 @@ $(document).keydown(function(e) {
         $('#end-modal').addClass('hidden');
     }
 });
+
+
+//
+// Socket IO
+//
+
+var socket = io();
+
+var queryStrings = new URLSearchParams(window.location.search);
+let gameId = queryStrings.get('id');
+
+socket.emit('joinRoom', gameId);
+
+socket.on('write to log', function(msg) {
+    console.log(msg.data);
+});
+
+socket.on('server keypress', function(data) {
+    if (data.sent_by !== vm.playerId) {
+        vm.handleKeypress(data.key, false)
+    }
+});
+
+function sendServerKeypress(key) {
+    socket.emit('keypress', {'key': key, 'room': gameId});
+}
