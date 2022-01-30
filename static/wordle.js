@@ -205,11 +205,11 @@ const wordle = Vue.createApp({
         }
     },
     methods: {
-        handleKeypress(keypress, sendToServer = true) {
+        handleKeypress(keypress, sendToServer = true, overrideLock = false) {
             var urlParams = new URLSearchParams(window.location.search);
             let custom_game_creator = urlParams.toString().includes(this.playerId);
 
-            if (this.donePlaying || (this.customMpGame && custom_game_creator)) {
+            if (this.donePlaying || (this.customMpGame && custom_game_creator && !overrideLock)) {
                 return true;
             }
 
@@ -401,7 +401,7 @@ socket.on('write to log', function(msg) {
 
 socket.on('server keypress', function(data) {
     if (data.sent_by !== vm.playerId) {
-        vm.handleKeypress(data.key, false)
+        vm.handleKeypress(data.key, sendToServer = false, overrideLock = true);
     }
 });
 

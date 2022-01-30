@@ -366,10 +366,10 @@ def disconnect():
 @socketio.on('keypress')
 def handle_keypress(json):
     print(json)
-    if json['key'].lower() not in ['enter', 'del', 'backspace']:
+    if json['key'].lower() not in ['enter', 'del', 'backspace'] \
+        and json['key'].lower() in 'qwertyuiopasdfghjklzxcvbnm':
         if len(multiplayer_words[json['room']]['loose_letters']) < 5:
             multiplayer_words[json['room']]['loose_letters'].append(json['key'].lower())
-            print(multiplayer_words[json['room']])
 
     elif json['key'].lower() == 'enter':
         if len(multiplayer_words[json['room']]['loose_letters']) == 5:
