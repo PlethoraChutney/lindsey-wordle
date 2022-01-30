@@ -325,8 +325,6 @@ sendRequest({
             vm.currentWord++;
         }
 
-        vm.wordSlots[vm.currentWord].word = data.letters;
-
         if ('word' in data) {
             vm.answerWord = data['word'].toLocaleUpperCase();
         }
@@ -334,6 +332,7 @@ sendRequest({
         if ('custom' in data) {
             vm.isMpGame = true;
             vm.customMpGame = data.custom;
+            vm.wordSlots[vm.currentWord].word = data.letters;
         }
     }))
 
@@ -390,11 +389,10 @@ $(document).keydown(function(e) {
 // Socket IO
 //
 
-var socket = io();
-
 var queryStrings = new URLSearchParams(window.location.search);
 let gameId = queryStrings.get('id');
 
+var socket = io();
 socket.emit('joinRoom', gameId);
 
 socket.on('write to log', function(msg) {
