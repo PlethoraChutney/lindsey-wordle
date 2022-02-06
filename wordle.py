@@ -365,23 +365,28 @@ def disconnect():
 
 @socketio.on('keypress')
 def handle_keypress(json):
-    print(json)
+    to_emit = {
+        'key': json['key'],
+        'sent_by': players[request.sid]['wordle_id']
+    }
     if json['key'].lower() not in ['enter', 'del', 'backspace']:
         if len(multiplayer_words[json['room']]['loose_letters']) < 5:
             multiplayer_words[json['room']]['loose_letters'].append(json['key'].lower())
-            print(multiplayer_words[json['room']])
 
     elif json['key'].lower() == 'enter':
         if len(multiplayer_words[json['room']]['loose_letters']) == 5:
             multiplayer_words[json['room']]['loose_letters'] = []
+            to_emit['new_word'] = json['word_submitted']
 
     elif json['key'].lower() in ['del', 'backspace']:
         multiplayer_words[json['room']]['loose_letters'].pop()
+        if len(multiplayer_words[json['room']]['loose_letters']) == 0:
+            to_emit['clear_word'] = True
+        else:
+            to_emit['clear_word'] = False
 
 
-    emit('server keypress', {
-        'key': json['key'], 'sent_by': players[request.sid]['wordle_id']
-        }, to = json['room']);
+    emit('server keypress', to_emit, to = json['room']);
 
 if __name__ == '__main__':
     socketio.run(app)
