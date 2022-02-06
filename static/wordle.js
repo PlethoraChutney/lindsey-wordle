@@ -400,11 +400,27 @@ socket.on('write to log', function(msg) {
 });
 
 socket.on('server keypress', function(data) {
+    if (data.new_word) {
+        vm.wordSlots[vm.currentWord]['word'] = data.new_word.toLocaleUpperCase().split('');
+    }
+
+    if (data.clear_word) {
+        vm.wordSlots[vm.currentWord]['word'] = [];
+    }
+
     if (data.sent_by !== vm.playerId) {
         vm.handleKeypress(data.key, sendToServer = false, overrideLock = true);
     }
 });
 
 function sendServerKeypress(key) {
-    socket.emit('keypress', {'key': key, 'room': gameId});
+    let toEmit = {
+        'key': key,
+        'room': gameId
+    }
+
+    if (key.toLocaleLowerCase() === 'enter') {
+        toEmit['word_submitted'] = vm.wordSlots[vm.currentWord]['word'].join('')
+    }
+    socket.emit('keypress', toEmit);
 }
